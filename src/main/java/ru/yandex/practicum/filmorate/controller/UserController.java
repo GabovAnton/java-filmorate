@@ -17,7 +17,7 @@ public class UserController {
     private static int id = 0;
 
     @GetMapping()
-    public HashSet<User> findAll() {
+    public HashSet<User> getAll() {
         log.debug("current users amount: {}", users.size());
         return users;
     }

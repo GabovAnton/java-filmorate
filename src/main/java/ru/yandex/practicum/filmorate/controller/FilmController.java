@@ -18,7 +18,7 @@ public class FilmController {
     private static int id = 0;
 
     @GetMapping()
-    public HashSet<Film> findAll() {
+    public HashSet<Film> getAll() {
         log.debug("current films amount: {}", films.size());
         return films;
     }

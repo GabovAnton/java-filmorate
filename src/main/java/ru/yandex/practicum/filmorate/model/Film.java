@@ -12,7 +12,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
 public class Film {
     private int id;
