@@ -177,7 +177,7 @@ public class UserControllerTests {
                                     .content(objectMapper.writeValueAsString(user))
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().isServiceUnavailable());
+                    .andExpect(status().isNotFound());
 
         } catch (Exception e) {
             Exception exception =

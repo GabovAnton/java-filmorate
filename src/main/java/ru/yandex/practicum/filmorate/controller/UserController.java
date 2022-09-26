@@ -1,58 +1,66 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
 
-    private final HashSet<User> users = new HashSet<>();
-    private static int id = 0;
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("{id}")
+    public Optional<User> getUserById(@PathVariable long id) {
+        return Optional.ofNullable(userService.getUser(id));
+    }
 
     @GetMapping()
-    public HashSet<User> getAll() {
-        log.debug("current users amount: {}", users.size());
-        return users;
+    public List<User> getAll() {
+        return userService.getAll();
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public Optional<List<User>> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        return Optional.ofNullable(userService.getMutualFriends(id, otherId));
+    }
+
+    @GetMapping("{id}/friends")
+    public Optional<List<User>> getFriends(@PathVariable long id) {
+        return Optional.ofNullable(userService.getFriends(id));
     }
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(++id);
-        users.stream().filter(x -> x.equals(user))
-                .findAny().ifPresentOrElse(u -> {
-                    throw new ValidationException("user already exist");
-                }, () -> users.add(user));
-
-        log.debug("user {} successfully added", user);
-
-        return user;
+        return userService.create(user);
     }
-
 
     @PutMapping()
     public User update(@Valid @RequestBody User user) {
-
-        users.stream().filter(x -> x.getId() == user.getId())
-                .findAny().ifPresentOrElse(u -> {
-                    users.remove(u);
-                    users.add(user);
-                }, () -> {
-                    throw new ValidationException("user doesn't exist");
-                });
-
-        log.debug("user {} successfully updated", user);
-
-        return user;
+        return userService.update(user);
     }
+
+    @DeleteMapping("{id}/friends/{friendId}")
+    public boolean delete(@PathVariable long id, @PathVariable long friendId) {
+        return userService.removeFriend(id, friendId);
+    }
+
+    @PutMapping("{id}/friends/{friendId}")
+    public boolean addFriend(@PathVariable long id, @PathVariable long friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
 
 }
