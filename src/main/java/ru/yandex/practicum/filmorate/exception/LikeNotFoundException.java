@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.exception;
 
-public class FilmNotFoundException extends RuntimeException {
-    public FilmNotFoundException(String s) {
+public class LikeNotFoundException extends RuntimeException {
+    public LikeNotFoundException(String s) {
         super(s);
     }
 }

@@ -24,42 +24,63 @@ public class UserController {
 
     @GetMapping("{id}")
     public Optional<User> getUserById(@PathVariable long id) {
-        return Optional.ofNullable(userService.getUser(id));
+        Optional<User> user = Optional.ofNullable(userService.getUser(id));
+        log.debug("user with id: {} requested, returned result: {}", id, user);
+
+        return user;
     }
 
     @GetMapping()
     public List<User> getAll() {
-        return userService.getAll();
+        List<User> all = userService.getAll();
+        log.debug("all users requested: {}", all.size());
+        return all;
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
     public Optional<List<User>> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
-        return Optional.ofNullable(userService.getMutualFriends(id, otherId));
+        Optional<List<User>> mutualFriends = Optional.ofNullable(userService.getMutualFriends(id, otherId));
+        log.debug("mutual friends for users with id's: {},{} requested, returned result count: {}",
+                id, otherId, mutualFriends);
+
+        return mutualFriends;
     }
 
     @GetMapping("{id}/friends")
     public Optional<List<User>> getFriends(@PathVariable long id) {
-        return Optional.ofNullable(userService.getFriends(id));
+        Optional<List<User>> friends = Optional.ofNullable(userService.getFriends(id));
+        log.debug("requested friends for user id: {}, returned result: {}", id, friends);
+        return friends;
     }
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) {
-        return userService.create(user);
+        User newUser = userService.create(user);
+        log.debug("new user created: {}", newUser);
+        return newUser;
     }
 
     @PutMapping()
     public User update(@Valid @RequestBody User user) {
-        return userService.update(user);
+        User updatedUser = userService.update(user);
+        log.debug("user updated: {} ->  {}", user, updatedUser);
+        return updatedUser;
     }
 
     @DeleteMapping("{id}/friends/{friendId}")
     public boolean delete(@PathVariable long id, @PathVariable long friendId) {
-        return userService.removeFriend(id, friendId);
+        boolean result = userService.removeFriend(id, friendId);
+        log.debug("user with id: {} has been deleted" + (result ? "successfully" : "with error"), id);
+        return result;
     }
 
     @PutMapping("{id}/friends/{friendId}")
     public boolean addFriend(@PathVariable long id, @PathVariable long friendId) {
-        return userService.addFriend(id, friendId);
+        boolean result = userService.addFriend(id, friendId);
+        log.debug("user with id: {} added as mutual friend to user id: {}" + (result ? "successfully" : "with error"),
+                id, friendId);
+
+        return result;
     }
 
 

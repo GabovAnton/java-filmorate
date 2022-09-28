@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.NonNull;
+import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,7 +44,7 @@ public class Film {
             likes.remove(userId);
             return true;
         } else {
-            throw new NullPointerException("Like for user id: " + userId + " not found");
+            throw new LikeNotFoundException("Like for user id: " + userId + " not found");
         }
     }
 
