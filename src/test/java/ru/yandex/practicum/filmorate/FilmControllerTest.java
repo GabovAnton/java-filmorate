@@ -128,8 +128,6 @@ public class FilmControllerTest {
 
     @Test
     void updateFilmWithWrongIdShouldThrowValidationException() {
-
-
         Film film = new Film();
         film.setId(2200);
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
@@ -144,7 +142,7 @@ public class FilmControllerTest {
                                     .content(objectMapper.writeValueAsString(film))
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().isServiceUnavailable());
+                    .andExpect(status().isNotFound());
 
         } catch (Exception e) {
             Exception exception =
