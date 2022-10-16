@@ -7,8 +7,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class User {
@@ -16,15 +16,19 @@ public class User {
 
     private long id;
 
-    private Set<Long> friends;
+    private HashMap<Long, Byte> friends;
 
     public Set<Long> getFriends() {
-        final Set<Long> friendsCollection = friends;
+        final Set<Long> friendsCollection = friends.entrySet()
+                .stream()
+                .filter(x->x.getValue().equals((byte)1))
+                .map(y->y.getKey())
+                .collect(Collectors.toSet());
         return friendsCollection;
     }
 
     public User() {
-        friends =new HashSet<>();
+        friends = new HashMap<>();
     }
 
     @NotBlank
@@ -41,9 +45,27 @@ public class User {
     @Past
     private LocalDate birthday;
 
-    public void addFriend(User user) {
+    public boolean addFriend(User user) {
+        friends.putIfAbsent(user.id, (byte) 0);
+        return true;
+    }
 
-        friends.add(user.id);
+    public boolean acceptFriend(long id) {
+        friends.computeIfPresent(id, (k, v) -> v = (byte) 1);
+        return true;
+    }
+
+    public boolean declineFriend(long id) {
+        friends.computeIfPresent(id, (k, v) -> v = (byte) 0);
+        return true;
+    }
+    public Set<Long> getNotApprovedFriends() {
+        final Set<Long> friendsCollection = friends.entrySet()
+                .stream()
+                .filter(x->x.getValue().equals((byte)1))
+                .map(y->y.getKey())
+                .collect(Collectors.toSet());
+        return friendsCollection;
     }
 
     public boolean removeFriend(long id) {

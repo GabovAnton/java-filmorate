@@ -15,6 +15,8 @@ import java.util.HashMap;
 public class Film {
     private int id;
 
+    private FilmGenreType genre;
+    private FilmRating rating;
     private HashMap<Long, Integer> likes;
 
     public Film() {
@@ -23,6 +25,7 @@ public class Film {
 
 
     @NotBlank
+    @Size(max = 100)
     private String name;
 
     @Size(max = 200)
