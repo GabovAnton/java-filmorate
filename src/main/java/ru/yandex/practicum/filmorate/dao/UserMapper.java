@@ -1,0 +1,23 @@
+package ru.yandex.practicum.filmorate.dao;
+
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+import ru.yandex.practicum.filmorate.model.User;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+
+public class UserMapper implements RowMapper<User>{
+
+    @Override
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        User user = new User();
+        user.setId(Long.parseLong(rs.getString("ID")));
+        user.setName(rs.getString("NAME"));
+        user.setLogin(rs.getString("LOGIN"));
+        user.setBirthday(rs.getDate("BIRTHDAY").toLocalDate());
+        return user;
+    }
+}
+
