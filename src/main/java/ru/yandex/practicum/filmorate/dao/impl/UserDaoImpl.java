@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.dao.UserMapper;
@@ -39,6 +40,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    @Transactional
     public Optional<User> create(@Valid @RequestBody User user) {
         String sqlQuery = "insert into 'filmorate.users'( NAME, LOGIN, EMAIL, BIRTHDAY) " +
                 "VALUES (?, ?, ?, ?, ?)";

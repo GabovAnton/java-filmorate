@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.dao;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmGenreType;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -14,7 +16,14 @@ public interface FilmDao {
 
     Optional<Film> getByID(@Valid Integer id);
 
-    @Valid Optional<Film> create(@Valid @RequestBody Film film);
+
+    @Valid
+    @Transactional
+    Optional<Film> create(@Valid @RequestBody Film film, List<FilmGenreType> genres);
 
     boolean addLike(@Valid long userId, @Valid Film film);
+
+    boolean removeLike(long userId, Film film);
+
+    List<Film> getTopFilms(int number);
 }

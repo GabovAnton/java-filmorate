@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
