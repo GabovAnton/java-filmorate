@@ -30,15 +30,15 @@ public class FilmController {
     }
 
     @PostMapping()
-    public @Valid Film create(@Valid @RequestBody Film film) {
-        Film newFilm = filmService.create(film);
+    public @Valid Optional<Film> create(@Valid @RequestBody Film film) {
+        Optional<Film> newFilm = filmService.create(film);
         log.debug("new film created: {}", newFilm);
         return newFilm;
     }
 
     @PutMapping()
-    public @Valid Film update(@Valid @RequestBody Film film) {
-        Film updatedFilm = filmService.update(film);
+    public @Valid Optional<Film> update(@Valid @RequestBody Film film) {
+        @Valid Optional<Film> updatedFilm = filmService.update(film);
         log.debug("film updated: {} ->  {}", film, updatedFilm);
         return updatedFilm;
     }
@@ -79,5 +79,7 @@ public class FilmController {
 
         return topPopularFilms;
     }
+
+ //   @GetMapping(/genres )
 
 }

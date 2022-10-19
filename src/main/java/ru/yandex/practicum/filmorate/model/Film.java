@@ -12,12 +12,13 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 public class Film {
     private int id;
 
-    private FilmGenreType genre;
+    private List<FilmGenreType> genres;
 
     @Enumerated(EnumType.STRING)
     private FilmRating rating;

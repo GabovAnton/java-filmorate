@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -12,10 +13,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("UserDAODb") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -45,8 +47,10 @@ public class UserService {
         return userStorage.getAll();
     }
 
-    public User create(User user) { //TODO переделать ошибку
-        return userStorage.create(user).orElseThrow(() -> new UserNotFoundException("user doesn't exists", user.getId()));
+    public User create(User user) {
+        return userStorage.create(user)
+                .orElseThrow(() ->
+                        new UserNotFoundException("newly created user doesn't exists in storage", user.getId()));
     }
 
     public List<User> getMutualFriends(long userOneId, long userTwoId) {

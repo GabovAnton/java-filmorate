@@ -7,7 +7,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.dao.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -20,10 +19,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component("UserDAODb")
-public class UserDaoImpl implements UserStorage {
+public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDaoImpl(JdbcTemplate jdbcTemplate) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -31,15 +30,18 @@ public class UserDaoImpl implements UserStorage {
     @Override
     public List<User> getAll() {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.users'", new UserMapper());
+                .query("SELECT * FROM  \"filmorate.users\"", new UserMapper());
     }
 
     @Override
     @Transactional
     public Optional<User> create(@Valid @RequestBody User user) {
-        String sqlQuery = "insert into 'filmorate.users'( NAME, LOGIN, EMAIL, BIRTHDAY) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
 
+        String sqlQuery = "insert into \"filmorate.users\"( NAME, LOGIN, EMAIL, BIRTHDAY) " +
+                "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -56,7 +58,7 @@ public class UserDaoImpl implements UserStorage {
 
     @Override
     public Optional<User> update(@Valid @RequestBody User user) {
-        String sqlQuery = "UPDATE  'filmorate.users' SET NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ?" +
+        String sqlQuery = "UPDATE  \"filmorate.users\" SET NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ?" +
                 "WHERE ID = ?";
 
          jdbcTemplate
@@ -68,19 +70,19 @@ public class UserDaoImpl implements UserStorage {
     @Override
     public Optional<User> getByEmail(@RequestBody String email) {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.users' WHERE EMAIL = ?", new UserMapper(), new Object[]{email})
+                .query("SELECT * FROM  \"filmorate.users\" WHERE EMAIL = ?", new UserMapper(), new Object[]{email})
                 .stream().findAny();
     }
 
     @Override
     public boolean delete(long userId) {
-        String sqlQuery = "delete from 'filmorate.users' where ID = ?";
+        String sqlQuery = "delete from \"filmorate.users\" where ID = ?";
         return jdbcTemplate.update(sqlQuery, userId) > 0;    }
 
     @Override
     public Optional<User> getById(long userId) {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.users' WHERE id = ?", new UserMapper(), new Object[]{userId})
+                .query("SELECT * FROM  \"filmorate.users\" WHERE id = ?", new UserMapper(), new Object[]{userId})
                 .stream().findAny();    }
 
 

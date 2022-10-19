@@ -7,7 +7,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.dao.FilmGenreTypeMapper;
 import ru.yandex.practicum.filmorate.dao.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.FilmRatingMapper;
@@ -25,33 +24,33 @@ import java.util.Optional;
 
 @Slf4j
 @Component("FilmDAODb")
-public class FilmDaoImpl implements FilmStorage {
+public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private int batchSize = 30;
 
-    public FilmDaoImpl(JdbcTemplate jdbcTemplate) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public List<Film> getAll() {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.films'", new FilmMapper());
+                .query("SELECT * FROM  \"filmorate.films\"", new FilmMapper());
     }
 
     @Override
     public Optional<Film> getByID(@Valid Integer id) {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.films' WHERE id = ?", new FilmMapper(), new Object[]{id})
+                .query("SELECT * FROM  \"filmorate.films\" WHERE id = ?", new FilmMapper(), new Object[]{id})
                 .stream().findAny();
     }
 
     @Override
     @Valid
     @Transactional//(propagation = Propagation.REQUIRES_NEW)
-    public Optional<Film> create(@Valid @RequestBody Film film, List<FilmGenreType> genres) {
+    public Optional<Film> create(@Valid @RequestBody Film film) {
 
-        String sqlQueryInsertFilm = "insert into 'filmorate.films'(NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID) " +
+        String sqlQueryInsertFilm = "insert into \"filmorate.films\" (NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -66,12 +65,12 @@ public class FilmDaoImpl implements FilmStorage {
             return stmt;
         }, keyHolder);
 
-        String sqlQueryInsertMPA = "insert into 'filmorate.film_genres'(GENRE_ID, FILM_ID) " +
+        String sqlQueryInsertMPA = "insert into \"filmorate.film_genres\"(GENRE_ID, FILM_ID) " +
                 "VALUES (?, ?)  WHERE ID = ?";
 
         jdbcTemplate.batchUpdate(
                 sqlQueryInsertMPA,
-                genres,
+                film.getGenres(),
                 batchSize,
                 (ps, argument) -> {
                     ps.setInt(1, argument.getId());
@@ -86,7 +85,7 @@ public class FilmDaoImpl implements FilmStorage {
     @Override
     @Valid
     public Optional<Film> update(Film film) {
-        String sqlQueryUpdateFilm = "UPDATE into 'filmorate.films' SET NAME =?, " +
+        String sqlQueryUpdateFilm = "UPDATE into \"filmorate.films\" SET NAME =?, " +
                 "DESCRIPTION =?, DURATION = ?, RELEASE_DATE = ?, RATING_ID = ?" +
                 "WHERE ID = ?";
 
@@ -99,7 +98,7 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public boolean addLike(@Valid long userId, @Valid Film film) {
-        String sqlQuery = "insert into 'filmorate.film_likes'(USER_ID, FILM_ID) " +
+        String sqlQuery = "insert into \"filmorate.film_likes\"(USER_ID, FILM_ID) " +
                 "VALUES (?, ?)";
         jdbcTemplate.update(
                 sqlQuery, userId, film.getId());
@@ -108,7 +107,7 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public boolean removeLike(long userId, Film film) {
-        String sqlQuery = "delete from 'filmorate.film_likes' where USER_ID = ? and FILM_ID = ?";
+        String sqlQuery = "delete from \"filmorate.film_likes\" where USER_ID = ? and FILM_ID = ?";
 
         return jdbcTemplate.update(sqlQuery, userId, film.getId()) > 0;
     }
@@ -129,7 +128,7 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public Optional<FilmGenreType> getGenreById(int id) {
-        String sqlQuery = "SELECT * FROM  'filmorate.genres' WHERE id = ?";
+        String sqlQuery = "SELECT * FROM  \"filmorate.genres\" WHERE id = ?";
 
         return jdbcTemplate
                 .query(sqlQuery, new FilmGenreTypeMapper(), new Object[]{id})
@@ -140,26 +139,26 @@ public class FilmDaoImpl implements FilmStorage {
     @Override
     public List<FilmGenreType> getAllGenres() {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.genres'", new FilmGenreTypeMapper());
+                .query("SELECT * FROM  \"filmorate.genres\"", new FilmGenreTypeMapper());
     }
 
     @Override
     public List<FilmRating> getAllMPA() {
         return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.ratings'", new FilmRatingMapper());
+                .query("SELECT * FROM  \"filmorate.ratings\"", new FilmRatingMapper());
     }
 
     @Override
     public Optional<FilmRating> getMPAById(int id) {
-        String sqlQuery = "SELECT * FROM  'filmorate.ratings' WHERE id = ?";
+        String sqlQuery = "SELECT * FROM  \"filmorate.ratings\" WHERE id = ?";
 
         return jdbcTemplate
                 .query(sqlQuery, new FilmRatingMapper(), new Object[]{id})
                 .stream().findAny();
     }
-
-    boolean deleteFilm(int id) {
-        String sqlQuery = "delete from 'filmorate.films' where ID = ?";
+    @Override
+    public boolean deleteFilm(int id) {
+        String sqlQuery = "delete from \"filmorate.films\" where ID = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
