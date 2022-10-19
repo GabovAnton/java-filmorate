@@ -26,4 +26,8 @@ public interface FilmDao {
     boolean removeLike(long userId, Film film);
 
     List<Film> getTopFilms(int number);
+
+    Optional<FilmGenreType> getGenreById (int id);
+    List<FilmGenreType> getAllGenres();
+
 }

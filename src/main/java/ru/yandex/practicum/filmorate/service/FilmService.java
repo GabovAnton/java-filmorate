@@ -3,9 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmGenreType;
+import ru.yandex.practicum.filmorate.model.FilmRating;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FilmService {
@@ -43,4 +46,16 @@ public class FilmService {
     public boolean removeFilm (int id) {
         return filmStorage.deleteFilm(id);
     }
+
+    public Optional<FilmGenreType> getGenreById (int id) {
+        return filmStorage.getGenreById(id);
+    }
+    public  Optional<FilmRating> getMPAById(int id) {
+        return filmStorage.getMPAById(id);
+    }
+
+    public List<FilmGenreType> getAllGenres(){
+        return filmStorage.getAllGenres();
+    }
+
 }

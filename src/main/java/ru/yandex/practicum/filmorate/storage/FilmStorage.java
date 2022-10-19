@@ -2,9 +2,12 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmGenreType;
+import ru.yandex.practicum.filmorate.model.FilmRating;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 public interface FilmStorage {
     List<Film> getAll();
@@ -22,4 +25,10 @@ public interface FilmStorage {
     List<Film> getTopFilms(int number);
 
     boolean deleteFilm(int id);
+
+    Optional<FilmGenreType> getGenreById (int id);
+
+    List<FilmGenreType> getAllGenres();
+
+    Optional<FilmRating> getMPAById(int id);
 }

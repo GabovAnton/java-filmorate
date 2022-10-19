@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NonNull;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -16,6 +18,8 @@ public class Film {
     private int id;
 
     private FilmGenreType genre;
+
+    @Enumerated(EnumType.STRING)
     private FilmRating rating;
     private HashMap<Long, Integer> likes;
 

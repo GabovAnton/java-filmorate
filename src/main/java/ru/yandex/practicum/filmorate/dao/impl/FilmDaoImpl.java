@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
+import ru.yandex.practicum.filmorate.dao.FilmGenreTypeMapper;
 import ru.yandex.practicum.filmorate.dao.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmGenreType;
@@ -47,7 +48,7 @@ public class FilmDaoImpl implements FilmDao {
     @Transactional//(propagation = Propagation.REQUIRES_NEW)
     public Optional<Film> create(@Valid @RequestBody Film film, List<FilmGenreType> genres) {
 
-        String sqlQueryInsertFilm = "insert into 'filmorate.films'(NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING) " +
+        String sqlQueryInsertFilm = "insert into 'filmorate.films'(NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -58,7 +59,7 @@ public class FilmDaoImpl implements FilmDao {
             stmt.setString(2, film.getDescription());
             stmt.setInt(3, film.getDuration());
             stmt.setDate(4, Date.valueOf(film.getReleaseDate()));
-            stmt.setString(5, film.getRating().name());
+            stmt.setInt(5, film.getRating().id);
             return stmt;
         }, keyHolder);
 
@@ -94,6 +95,7 @@ public class FilmDaoImpl implements FilmDao {
 
         return jdbcTemplate.update(sqlQuery, userId, film.getId()) > 0;
     }
+
     @Override
     public List<Film> getTopFilms(int number) {
         StringBuilder sqlQueryBuilder = new StringBuilder();
@@ -107,6 +109,23 @@ public class FilmDaoImpl implements FilmDao {
         return jdbcTemplate
                 .query(sqlQueryBuilder.toString(), new FilmMapper(), number);
     }
+
+    @Override
+    public Optional<FilmGenreType> getGenreById(int id) {
+        String sqlQuery = "SELECT * FROM  'filmorate.genres' WHERE id = ?";
+
+        return jdbcTemplate
+                .query(sqlQuery, new FilmGenreTypeMapper(), new Object[]{id})
+                .stream().findAny();
+
+    }
+
+    @Override
+    public List<FilmGenreType> getAllGenres() {
+        return jdbcTemplate
+                .query("SELECT * FROM  'filmorate.genres'", new FilmGenreTypeMapper());
+    }
+
     boolean deleteFilm(int id) {
         String sqlQuery = "delete from 'filmorate.films' where ID = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;

@@ -5,14 +5,14 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmGenreType;
+import ru.yandex.practicum.filmorate.model.FilmRating;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -103,5 +103,20 @@ public class InMemoryFilmStorage implements FilmStorage {
         return true;
     }
 
+    @Override ////TODO реализовать метод!!!!!
+    public Optional<FilmGenreType> getGenreById(int id) {
+
+
+        return Optional.empty();
+    }
+
+    @Override ////TODO реализовать метод!!!!!
+    public List<FilmGenreType> getAllGenres() {
+        return null;
+    }
+    public  Optional<FilmRating> getMPAById(int id) {
+        return Optional.ofNullable(FilmRating.getMPA(id));
+
+    }
 
 }
