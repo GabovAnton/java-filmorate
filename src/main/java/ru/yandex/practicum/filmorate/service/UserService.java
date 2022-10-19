@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -44,8 +45,8 @@ public class UserService {
         return userStorage.getAll();
     }
 
-    public User create(User user) {
-        return userStorage.create(user);
+    public User create(User user) { //TODO переделать ошибку
+        return userStorage.create(user).orElseThrow(() -> new UserNotFoundException("user doesn't exists", user.getId()));
     }
 
     public List<User> getMutualFriends(long userOneId, long userTwoId) {
@@ -82,6 +83,10 @@ public class UserService {
     }
 
     public User update(User user) {
-        return userStorage.update(user);
+        return userStorage.update(user).orElseThrow(() -> new UserNotFoundException("user doesn't exists", user.getId()));
+    }
+
+    Optional<User> getByEmail(@RequestBody String email) {
+        return userStorage.getByEmail(email);
     }
 }

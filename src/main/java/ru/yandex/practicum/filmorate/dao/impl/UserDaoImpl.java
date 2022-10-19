@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.dao.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.sql.Date;
@@ -19,19 +20,13 @@ import java.util.Optional;
 
 @Slf4j
 @Component("UserDAODb")
-public class UserDaoImpl implements UserDao {
+public class UserDaoImpl implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public UserDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
-    public Optional<User> getUser(long id) {
-        return jdbcTemplate
-                .query("SELECT * FROM  'filmorate.users' WHERE id = ?", new UserMapper(), new Object[]{id})
-                .stream().findAny();
-    }
 
     @Override
     public List<User> getAll() {
@@ -56,7 +51,7 @@ public class UserDaoImpl implements UserDao {
             return stmt;
         }, keyHolder);
 
-        return getUser(keyHolder.getKey().longValue());
+        return getById(keyHolder.getKey().longValue());
     }
 
     @Override
@@ -66,7 +61,7 @@ public class UserDaoImpl implements UserDao {
 
          jdbcTemplate
                 .update(sqlQuery, user.getName(), user.getLogin(),user.getEmail(), user.getBirthday(), user.getId());
-        return getUser(user.getId());
+        return getById(user.getId());
 
     }
 
@@ -77,6 +72,16 @@ public class UserDaoImpl implements UserDao {
                 .stream().findAny();
     }
 
+    @Override
+    public boolean delete(long userId) {
+        String sqlQuery = "delete from 'filmorate.users' where ID = ?";
+        return jdbcTemplate.update(sqlQuery, userId) > 0;    }
+
+    @Override
+    public Optional<User> getById(long userId) {
+        return jdbcTemplate
+                .query("SELECT * FROM  'filmorate.users' WHERE id = ?", new UserMapper(), new Object[]{userId})
+                .stream().findAny();    }
 
 
 }

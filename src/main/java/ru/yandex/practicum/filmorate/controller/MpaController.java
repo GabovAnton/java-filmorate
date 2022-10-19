@@ -27,7 +27,7 @@ public class MpaController {
     @GetMapping()
     public List<FilmRating> getAll() {
         List<FilmRating> all = filmService.getAllMPA();
-        log.debug("all films requested: {}", all.size());
+        log.debug("all film ratings requested: {}", all.size());
         return all;
     }
     @GetMapping("{id}")

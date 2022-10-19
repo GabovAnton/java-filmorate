@@ -10,13 +10,13 @@ import java.util.Optional;
 public interface UserStorage {
     List<User> getAll();
 
-    User create(@Valid @RequestBody User user);
+    Optional<User> create(@Valid @RequestBody User user);
 
-    User update(@Valid @RequestBody User user);
+    Optional<User> update(@Valid @RequestBody User user);
 
     Optional<User> getById(@RequestBody long userId);
 
-    User getByEmail(@RequestBody String email);
+    Optional<User> getByEmail(@RequestBody String email);
 
     boolean delete(long userId);
 }

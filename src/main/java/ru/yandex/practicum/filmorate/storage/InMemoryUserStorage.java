@@ -25,7 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User create(User user) {
+    public Optional<User> create(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -37,11 +37,11 @@ public class InMemoryUserStorage implements UserStorage {
 
         log.debug("user {} successfully added", user);
 
-        return user;
+        return getById(user.getId());
     }
 
     @Override
-    public User update(User user) {
+    public Optional<User> update(User user) {
         users.stream().filter(x -> x.getId() == user.getId())
                 .findAny().ifPresentOrElse(u -> {
                     users.remove(u);
@@ -52,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         log.debug("user {} successfully updated", user);
 
-        return user;
+        return getById(user.getId());
     }
 
     @Override
@@ -63,11 +63,10 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getByEmail(String email) {
+    public Optional<User> getByEmail(String email) {
         return users.stream()
                 .filter(x -> x.getEmail().equals(email))
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException("user doesn't exists", email));
+                .findFirst();
     }
 
     @Override

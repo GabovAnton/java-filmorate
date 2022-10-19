@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.dao.FilmRatingMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmGenreType;
 import ru.yandex.practicum.filmorate.model.FilmRating;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.sql.Date;
@@ -24,7 +25,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component("FilmDAODb")
-public class FilmDaoImpl implements FilmDao {
+public class FilmDaoImpl implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private int batchSize = 30;
 

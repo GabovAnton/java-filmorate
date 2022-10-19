@@ -39,13 +39,13 @@ public class FilmService {
       return  filmStorage.getTopFilms(number);
     }
 
-    public Film create(Film film) {
+    public Optional<Film> create(Film film) {
         return filmStorage.create(film);
     }
     public Optional<Film> getByID(Integer id) {
         return filmStorage.getByID(id);
     }
-    public Film update(Film film) {
+    public @Valid Optional<Film> update(Film film) {
         return filmStorage.update(film);
     }
 
