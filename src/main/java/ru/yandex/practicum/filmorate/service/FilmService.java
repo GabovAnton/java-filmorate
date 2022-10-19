@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmGenreType;
 import ru.yandex.practicum.filmorate.model.FilmRating;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +22,17 @@ public class FilmService {
     }
 
     public boolean addLike(int filmId, long userId) {
-        return filmStorage.addLike(userId, filmStorage.getByID(filmId));
+        return filmStorage.addLike(userId,
+                filmStorage.getByID(filmId).orElseThrow(() -> {
+            throw new FilmNotFoundException("film id: " + filmId + "doesn't exist");}));
     }
     public List<Film> getAll(){
        return filmStorage.getAll();
     }
     public boolean removeLike(int filmId, long userId) {
-        return filmStorage.removeLike(userId, filmStorage.getByID(filmId));
+        return filmStorage.removeLike(userId,
+                filmStorage.getByID(filmId).orElseThrow(() -> {
+                    throw new FilmNotFoundException("film id: " + filmId + "doesn't exist");}));
     }
 
     public List<Film> getTopPopularFilms(int number) {
@@ -36,7 +42,7 @@ public class FilmService {
     public Film create(Film film) {
         return filmStorage.create(film);
     }
-    public Film getByID(Integer id) {
+    public Optional<Film> getByID(Integer id) {
         return filmStorage.getByID(id);
     }
     public Film update(Film film) {
@@ -56,6 +62,10 @@ public class FilmService {
 
     public List<FilmGenreType> getAllGenres(){
         return filmStorage.getAllGenres();
+    }
+
+    public List<FilmRating> getAllMPA(){
+        return filmStorage.getAllMPA();
     }
 
 }

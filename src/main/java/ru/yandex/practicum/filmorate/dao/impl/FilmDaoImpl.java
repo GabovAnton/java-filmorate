@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.dao.FilmGenreTypeMapper;
 import ru.yandex.practicum.filmorate.dao.FilmMapper;
+import ru.yandex.practicum.filmorate.dao.FilmRatingMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmGenreType;
+import ru.yandex.practicum.filmorate.model.FilmRating;
 
 import javax.validation.Valid;
 import java.sql.Date;
@@ -81,6 +83,20 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
+    @Valid
+    public Optional<Film> update(Film film) {
+        String sqlQueryUpdateFilm = "UPDATE into 'filmorate.films' SET NAME =?, " +
+                "DESCRIPTION =?, DURATION = ?, RELEASE_DATE = ?, RATING_ID = ?" +
+                "WHERE ID = ?";
+
+        jdbcTemplate
+                .update(sqlQueryUpdateFilm, film.getName(), film.getDescription(),
+                film.getDuration(), film.getReleaseDate(), film.getRating().id, film.getId());
+
+        return getByID(film.getId());
+    }
+
+    @Override
     public boolean addLike(@Valid long userId, @Valid Film film) {
         String sqlQuery = "insert into 'filmorate.film_likes'(USER_ID, FILM_ID) " +
                 "VALUES (?, ?)";
@@ -124,6 +140,21 @@ public class FilmDaoImpl implements FilmDao {
     public List<FilmGenreType> getAllGenres() {
         return jdbcTemplate
                 .query("SELECT * FROM  'filmorate.genres'", new FilmGenreTypeMapper());
+    }
+
+    @Override
+    public List<FilmRating> getAllMPA() {
+        return jdbcTemplate
+                .query("SELECT * FROM  'filmorate.ratings'", new FilmRatingMapper());
+    }
+
+    @Override
+    public Optional<FilmRating> getMPAById(int id) {
+        String sqlQuery = "SELECT * FROM  'filmorate.ratings' WHERE id = ?";
+
+        return jdbcTemplate
+                .query(sqlQuery, new FilmRatingMapper(), new Object[]{id})
+                .stream().findAny();
     }
 
     boolean deleteFilm(int id) {

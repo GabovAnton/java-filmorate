@@ -45,7 +45,7 @@ public class FilmController {
 
     @GetMapping("{id}")
     public Optional<Film> getFilmById(@PathVariable int id) {
-        Optional<Film> requestedFilm = Optional.ofNullable(filmService.getByID(id));
+        Optional<Film> requestedFilm = filmService.getByID(id);
         log.debug("film with id: {} requested, returned result: {}", id, requestedFilm);
         return requestedFilm;
     }

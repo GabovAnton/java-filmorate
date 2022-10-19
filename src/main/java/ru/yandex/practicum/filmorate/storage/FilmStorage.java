@@ -12,11 +12,11 @@ import java.util.Optional;
 public interface FilmStorage {
     List<Film> getAll();
 
-    @Valid Film create(@Valid @RequestBody Film film);
+    Optional<Film> create(@Valid @RequestBody Film film);
 
-    @Valid Film update(@Valid @RequestBody Film film);
+    @Valid Optional<Film> update(@Valid @RequestBody Film film);
 
-    @Valid Film getByID(@Valid Integer id);
+    @Valid Optional<Film> getByID(@Valid Integer id);
 
     boolean addLike(@Valid long userId, @Valid Film film);
 
@@ -31,4 +31,6 @@ public interface FilmStorage {
     List<FilmGenreType> getAllGenres();
 
     Optional<FilmRating> getMPAById(int id);
+
+    List<FilmRating> getAllMPA();
 }

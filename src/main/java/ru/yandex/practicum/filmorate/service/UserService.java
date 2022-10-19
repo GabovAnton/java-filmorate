@@ -20,17 +20,24 @@ public class UserService {
 
 
     public boolean removeFriend(long friendIdOne, long friendIdTwo) {
-        return getUser(friendIdOne).removeFriend(friendIdTwo) && getUser(friendIdTwo).removeFriend(friendIdOne);
+
+        User userOne = getUser(friendIdOne).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + friendIdOne + " doesn't exists"));
+        User userTwo = getUser(friendIdTwo).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + friendIdTwo + " doesn't exists"));
+
+        return userOne.removeFriend(friendIdTwo) && userTwo.removeFriend(friendIdOne);
     }
 
     public boolean addFriend(long friendIdOne, long friendIdTwo) {
-        return addMutualFriends(getUser(friendIdOne), getUser(friendIdTwo));
+        return addMutualFriends(getUser(friendIdOne).orElseThrow(() ->
+                        new UserNotFoundException( "user id: " + friendIdOne + " doesn't exists")),
+                getUser(friendIdTwo).orElseThrow(() ->
+                        new UserNotFoundException( "user id: " + friendIdTwo + " doesn't exists")));
     }
 
-    public User getUser(long friendIdOne) {
-        Optional<User> userOne = Optional.ofNullable(userStorage.getById(friendIdOne));
-        return userOne.orElseThrow(() ->
-                new UserNotFoundException(userOne.isPresent() ? "user id: " + friendIdOne + " doesn't exists" : ""));
+    public Optional<User> getUser(long id) {
+        return userStorage.getById(id);
     }
 
     public List<User> getAll() {
@@ -43,11 +50,17 @@ public class UserService {
 
     public List<User> getMutualFriends(long userOneId, long userTwoId) {
         List<User> friends = new ArrayList<>();
-        if (getUser(userOneId).getFriends() != null) {
-            for (long friendId : getUser(userOneId).getFriends()) {
-                friends.addAll(getUser(userTwoId).getFriends().stream()
+        User userOne = getUser(userOneId).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + userOneId+ " doesn't exists"));
+        User userTwo = getUser(userTwoId).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + userTwoId + " doesn't exists"));
+
+        if (userOne.getFriends() != null) {
+            for (long friendId : userOne.getFriends()) {
+                friends.addAll(userTwo.getFriends().stream()
                         .filter(x -> x.equals(friendId))
-                        .map(this::getUser)
+                        .map(x->getUser(x).orElseThrow(() ->
+                                new UserNotFoundException( "user id: " + x + " doesn't exists")))
                         .collect(Collectors.toList()));
             }
         }
@@ -55,7 +68,11 @@ public class UserService {
     }
 
     public List<User> getFriends(long id) {
-        return getUser(id).getFriends().stream().map(this::getUser).collect(Collectors.toList());
+        User user = getUser(id).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + id + " doesn't exists"));
+
+        return user.getFriends().stream().map(x->getUser(x).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + x + " doesn't exists"))).collect(Collectors.toList());
     }
 
     private Boolean addMutualFriends(User one, User two) {

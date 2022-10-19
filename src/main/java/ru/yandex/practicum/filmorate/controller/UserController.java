@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping("{id}")
     public Optional<User> getUserById(@PathVariable long id) {
-        Optional<User> user = Optional.ofNullable(userService.getUser(id));
+        Optional<User> user = userService.getUser(id);
         log.debug("user with id: {} requested, returned result: {}", id, user);
 
         return user;

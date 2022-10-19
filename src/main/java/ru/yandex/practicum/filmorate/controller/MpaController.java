@@ -24,14 +24,14 @@ public class MpaController {
         this.filmService = filmService;
     }
 
- /*   @GetMapping()
+    @GetMapping()
     public List<FilmRating> getAll() {
-        List<Film> all = filmService.getAll();
+        List<FilmRating> all = filmService.getAllMPA();
         log.debug("all films requested: {}", all.size());
         return all;
-    }*/
+    }
     @GetMapping("{id}")
-    public Optional<FilmRating> getMPAByIDd(@PathVariable int id) {
+    public Optional<FilmRating> getMPAByID(@PathVariable int id) {
         Optional<FilmRating> requestedRating = filmService.getMPAById(id);
         log.debug("film rating with id: {} requested, returned result: {}", id, requestedRating);
         return requestedRating;
@@ -39,11 +39,4 @@ public class MpaController {
 }
 
 
-//GET /mpa
-// GET /mpa/{id}
-//
-// // Пример возвращаемого значения
-// {
-//   “id”: 1,
-//   “name”: “G”
-// }
+

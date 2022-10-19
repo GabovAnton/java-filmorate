@@ -12,7 +12,6 @@ import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -30,17 +29,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(Film film) {
+    public Optional<Film> create(Film film) {
         if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
-            film.setId(++id);
-
+           int newFilmId = ++id;
+           film.setId(newFilmId);
             films.stream().filter(x -> x.equals(film))
                     .findAny().ifPresentOrElse(u -> {
                         throw new ValidationException("film already exists");
                     }, () -> films.add(film));
 
             log.debug("film {} successfully added", film);
-            return film;
+            return getByID(newFilmId);
         } else {
             log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
             throw new FilmorateValidationException("Provided release date: '" + film.getReleaseDate()
@@ -49,7 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) {
+    public Optional<Film> update(Film film) {
         if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
             films.stream().filter(x -> x.getId() == film.getId())
                     .findAny().ifPresentOrElse(f -> {
@@ -60,7 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                     });
             log.debug("film {} successfully updated", film);
 
-            return film;
+            return getByID(film.getId());
 
         } else {
             log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
@@ -70,11 +69,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getByID(Integer id) {
+    public Optional<Film> getByID(Integer id) {
         return films.stream().filter(x -> x.getId() == id)
-                .findAny().orElseThrow(() -> {
-                    throw new FilmNotFoundException("film id: " + id + "doesn't exist");
-                });
+                .findAny();
     }
 
     @Override
@@ -117,6 +114,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     public  Optional<FilmRating> getMPAById(int id) {
         return Optional.ofNullable(FilmRating.getMPA(id));
 
+    }
+    @Override
+    public List<FilmRating> getAllMPA() {
+        return List.of(FilmRating.values());
     }
 
 }

@@ -66,7 +66,6 @@ public class UserDaoImpl implements UserDao {
 
          jdbcTemplate
                 .update(sqlQuery, user.getName(), user.getLogin(),user.getEmail(), user.getBirthday(), user.getId());
-         //batchupate
         return getUser(user.getId());
 
     }
