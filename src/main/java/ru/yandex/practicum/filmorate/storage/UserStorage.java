@@ -19,4 +19,8 @@ public interface UserStorage {
     Optional<User> getByEmail(@RequestBody String email);
 
     boolean delete(long userId);
+
+    List<User> getUserFriends(long id);
+
+    public boolean addFriend(long friendIdOne, long friendIdTwo);
 }

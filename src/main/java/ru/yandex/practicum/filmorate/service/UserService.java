@@ -73,11 +73,7 @@ public class UserService {
     }
 
     public List<User> getFriends(long id) {
-        User user = getUser(id).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + id + " doesn't exists"));
-
-        return user.getFriends().stream().map(x->getUser(x).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + x + " doesn't exists"))).collect(Collectors.toList());
+     return  userStorage.getUserFriends(id);
     }
 
     private Boolean addMutualFriends(User one, User two) {

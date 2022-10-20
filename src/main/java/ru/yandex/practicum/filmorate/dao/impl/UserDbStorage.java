@@ -61,8 +61,8 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "UPDATE  \"filmorate.users\" SET NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ?" +
                 "WHERE ID = ?";
 
-         jdbcTemplate
-                .update(sqlQuery, user.getName(), user.getLogin(),user.getEmail(), user.getBirthday(), user.getId());
+        jdbcTemplate
+                .update(sqlQuery, user.getName(), user.getLogin(), user.getEmail(), user.getBirthday(), user.getId());
         return getById(user.getId());
 
     }
@@ -77,13 +77,34 @@ public class UserDbStorage implements UserStorage {
     @Override
     public boolean delete(long userId) {
         String sqlQuery = "delete from \"filmorate.users\" where ID = ?";
-        return jdbcTemplate.update(sqlQuery, userId) > 0;    }
+        return jdbcTemplate.update(sqlQuery, userId) > 0;
+    }
+
+    @Override
+    public List<User> getUserFriends(long id) {
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT F.NAME");
+        query.append("FROM PUBLIC.\"filmorate.users\" AS U");
+        query.append("JOIN PUBLIC.\"filmorate.friends\" AS FR ON FR.USER_ID =U.ID");
+        query.append("JOIN PUBLIC.\"filmorate.users\" AS F ON F.ID  =FR.FOREIGN_USER_ID");
+        query.append("WHERE U.ID = ? AND FR.STATUS = 1;");
+        return jdbcTemplate.query(
+                query.toString(),
+                new UserMapper(), id);
+    }
+
+    @Override
+    public boolean addFriend(long friendIdOne, long friendIdTwo) {
+        String sqlQuery = "insert into \"filmorate.users\"( NAME, LOGIN, EMAIL, BIRTHDAY) " +
+                "VALUES (?, ?, ?, ?)";
+
+        return false;
+    }
 
     @Override
     public Optional<User> getById(long userId) {
         return jdbcTemplate
                 .query("SELECT * FROM  \"filmorate.users\" WHERE id = ?", new UserMapper(), new Object[]{userId})
-                .stream().findAny();    }
-
-
+                .stream().findAny();
+    }
 }

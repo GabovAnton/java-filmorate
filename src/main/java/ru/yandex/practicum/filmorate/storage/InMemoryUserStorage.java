@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -74,4 +75,12 @@ public class InMemoryUserStorage implements UserStorage {
         users.remove(getById(userId));
         return true;
     }
+
+    @Override
+    public List<User> getUserFriends(long id) {
+        User user = getById(id).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + id + " doesn't exists"));
+
+        return user.getFriends().stream().map(x->getById(x).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + x + " doesn't exists"))).collect(Collectors.toList());    }
 }
