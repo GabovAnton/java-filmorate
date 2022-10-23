@@ -1,25 +1,24 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.yandex.practicum.filmorate.model.FilmGenreType;
-import ru.yandex.practicum.filmorate.model.FilmRating;
+import ru.yandex.practicum.filmorate.model.MpaDictionary;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FilmRatingMapper implements RowMapper<FilmRating> {
+public class FilmRatingMapper implements RowMapper<MpaDictionary> {
     @Override
-    public FilmRating mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public MpaDictionary mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         switch (rs.getString("NAME")) {
             case ("G"):
-                return FilmRating.G;
+                return MpaDictionary.G;
             case ("PG"):
-                return FilmRating.PG;
+                return MpaDictionary.PG;
             case ("PG13"):
-                return FilmRating.PG13;
+                return MpaDictionary.PG13;
             case ("NC17"):
-                return FilmRating.NC17;
+                return MpaDictionary.NC17;
             default: return null; //TODO исправить!
         }
 

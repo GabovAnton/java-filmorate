@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -14,20 +12,23 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
-@Data
+
+@Getter
+@Setter
+@ToString
 public class Film {
     private int id;
 
-    private List<FilmGenreType> genres;
 
-    @Enumerated(EnumType.STRING)
-    private FilmRating rating;
+    private List<Genre> genres;
+
+    @NotNull
+    Mpa mpa;
     private HashMap<Long, Integer> likes;
 
     public Film() {
         likes = new HashMap<>();
     }
-
 
     @NotBlank
     @Size(max = 100)
@@ -39,6 +40,9 @@ public class Film {
     @NonNull
     @Positive
     private int duration;
+
+    @Value("${some.key:0}")
+    private int rate;
 
     @NotNull
     private LocalDate releaseDate;
@@ -55,5 +59,7 @@ public class Film {
             throw new LikeNotFoundException("Like for user id: " + userId + " not found");
         }
     }
+
+
 
 }

@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmGenreType;
-import ru.yandex.practicum.filmorate.model.FilmRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.MpaDictionary;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -25,16 +24,16 @@ public class MpaController {
     }
 
     @GetMapping()
-    public List<FilmRating> getAll() {
-        List<FilmRating> all = filmService.getAllMPA();
+    public List<Mpa> getAll() {
+        List<Mpa> all = filmService.getAllMPA();
         log.debug("all film ratings requested: {}", all.size());
         return all;
     }
     @GetMapping("{id}")
-    public Optional<FilmRating> getMPAByID(@PathVariable int id) {
-        Optional<FilmRating> requestedRating = filmService.getMPAById(id);
-        log.debug("film rating with id: {} requested, returned result: {}", id, requestedRating);
-        return requestedRating;
+    public Mpa getMPAByID(@PathVariable int id) {
+        Mpa mpa = filmService.getMPAById(id);
+        log.debug("film rating (MPA) with id: {} requested, returned result: {}", id, mpa);
+        return mpa;
     }
 }
 

@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmGenreType;
-import ru.yandex.practicum.filmorate.model.FilmRating;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,17 +20,18 @@ public interface FilmStorage {
 
     boolean addLike(@Valid long userId, @Valid Film film);
 
-    boolean removeLike(long userId, Film film);
+
+    boolean removeLike(long userId, int filmId);
 
     List<Film> getTopFilms(int number);
 
     boolean deleteFilm(int id);
 
-    Optional<FilmGenreType> getGenreById (int id);
+    Genre getGenreById (int id);
 
-    List<FilmGenreType> getAllGenres();
+    List<Genre> getAllGenres();
 
-    Optional<FilmRating> getMPAById(int id);
+    Mpa getMPAById(int id);
 
-    List<FilmRating> getAllMPA();
+    List<Mpa> getAllMPA();
 }

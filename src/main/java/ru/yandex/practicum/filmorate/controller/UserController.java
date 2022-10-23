@@ -73,14 +73,15 @@ public class UserController {
     @DeleteMapping("{id}/friends/{friendId}")
     public boolean delete(@PathVariable long id, @PathVariable long friendId) {
         boolean result = userService.removeFriend(id, friendId);
-        log.debug("user with id: {} has been deleted" + (result ? "successfully" : "with error"), id);
+        log.debug("friend with id: {} has been deleted from friends of user with id: {} "
+                + (result ? " successfully" : "with error"),friendId, id);
         return result;
     }
 
     @PutMapping("{id}/friends/{friendId}")
     public boolean addFriend(@PathVariable long id, @PathVariable long friendId) {
         boolean result = userService.addFriend(id, friendId);
-        log.debug("user with id: {} added as mutual friend to user id: {}" + (result ? "successfully" : "with error"),
+        log.debug("user with id: {} added as mutual friend to user id: {}" + (result ? " successfully" : "with error"),
                 id, friendId);
 
         return result;

@@ -23,4 +23,8 @@ public interface UserStorage {
     List<User> getUserFriends(long id);
 
     public boolean addFriend(long friendIdOne, long friendIdTwo);
+
+    List<User> getMutualFriends(long userOneId, long userTwoId);
+
+    boolean removeFriend(long friendIdOne, long friendIdTwo);
 }

@@ -1,17 +1,17 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.yandex.practicum.filmorate.model.FilmGenreType;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FilmGenreTypeMapper implements RowMapper<FilmGenreType> {
+public class FilmGenreTypeMapper implements RowMapper<Genre> {
     @Override
-    public FilmGenreType mapRow(ResultSet rs, int rowNum) throws SQLException {
-        FilmGenreType filmGenreType = new FilmGenreType();
-        filmGenreType.setName(rs.getString("NAME"));
-        filmGenreType.setId(rs.getInt("ID"));
+    public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Genre filmGenreType = new Genre();
+        filmGenreType.name =(rs.getString("NAME"));
+        filmGenreType.id =(rs.getInt("ID"));
         return filmGenreType;
     }
 }

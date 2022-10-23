@@ -5,8 +5,9 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmGenreType;
-import ru.yandex.practicum.filmorate.model.FilmRating;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.MpaDictionary;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -81,7 +82,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean removeLike(long userId, Film film) {
+    public boolean removeLike(long userId, int filmId) {
+        Film film = getByID(filmId)
+                .stream()
+                .findAny()
+                .orElseThrow(()->new FilmNotFoundException("film with id +" + filmId + " not found" ));
         return film.removeLike(userId);
     }
 
@@ -101,23 +106,30 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override ////TODO реализовать метод!!!!!
-    public Optional<FilmGenreType> getGenreById(int id) {
+    public Genre getGenreById(int id) {
 
 
-        return Optional.empty();
+        return null;
     }
 
     @Override ////TODO реализовать метод!!!!!
-    public List<FilmGenreType> getAllGenres() {
+    public List<Genre> getAllGenres() {
         return null;
     }
-    public  Optional<FilmRating> getMPAById(int id) {
-        return Optional.ofNullable(FilmRating.getMPA(id));
+
+    public Mpa getMPAById(int id) {
+        Mpa mpa = new Mpa();
+        mpa.name=MpaDictionary.getMPA(id);
+        mpa.id=id;
+        return mpa;
 
     }
     @Override
-    public List<FilmRating> getAllMPA() {
-        return List.of(FilmRating.values());
+    public List<Mpa> getAllMPA() {
+
+        //TODO исправить!
+       // return List.of(MpaDictionary.values());
+        return null;
     }
 
 }

@@ -74,17 +74,17 @@ CREATE TABLE IF NOT EXISTS PUBLIC."filmorate.friends" (
 
 INSERT INTO PUBLIC."filmorate.genres"
 (NAME)
-VALUES ('COMEDY'),
-       ('DRAMA'),
-       ('CARTOON'),
-       ('THRILLER'),
-       ('DOCUMENTARY'),
-       ('ACTION');
+VALUES ('Комедия'),
+       ('Драма'),
+       ('Мультфильм'),
+       ('Триллер'),
+       ('Документальный'),
+       ('Боевик');
 
 
 INSERT INTO PUBLIC."filmorate.ratings"
 (NAME)
-VALUES ('G'),('PG'),('PG13'),('NC17');
+VALUES ('G'),('PG'),('PG-13'), ('R'), ('NC-17');
 
 
 

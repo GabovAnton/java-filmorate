@@ -2,12 +2,24 @@ package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmRating;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.MpaDictionary;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class FilmMapper implements RowMapper<Film> {
+    private List<Genre> genres;
+
+    public FilmMapper(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    public FilmMapper() {
+    }
+
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Film film = new Film();
@@ -16,9 +28,14 @@ public class FilmMapper implements RowMapper<Film> {
         film.setDescription(rs.getString("DESCRIPTION"));
         film.setDuration(rs.getInt("DURATION"));
         film.setReleaseDate(rs.getDate("RELEASE_DATE").toLocalDate());
-        film.setRating(FilmRating.getMPA(rs.getInt("RATING_ID")));
-       // film.setGenres();
-//film.set(rs.getString(""));
+        Mpa mpa = new Mpa();
+        mpa.id = rs.getInt("RATING_ID");
+
+        mpa.name = rs.getString("RATING_NAME");
+        film.setMpa(mpa);
+        if (genres !=null) {
+            film.setGenres(genres);
+        }
         return film;
     }
 }

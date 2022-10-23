@@ -83,4 +83,49 @@ public class InMemoryUserStorage implements UserStorage {
 
         return user.getFriends().stream().map(x->getById(x).orElseThrow(() ->
                 new UserNotFoundException( "user id: " + x + " doesn't exists"))).collect(Collectors.toList());    }
+
+    @Override
+    public boolean addFriend(long friendIdOne, long friendIdTwo) {
+        return addMutualFriends(getById(friendIdOne).orElseThrow(() ->
+                        new UserNotFoundException( "user id: " + friendIdOne + " doesn't exists")),
+                getById(friendIdTwo).orElseThrow(() ->
+                        new UserNotFoundException( "user id: " + friendIdTwo + " doesn't exists")));
+    }
+
+    private Boolean addMutualFriends(User one, User two) {
+        one.addFriend(two);
+        two.addFriend(one);
+        return true;
+    }
+
+    @Override
+    public List<User> getMutualFriends(long userOneId, long userTwoId) {
+        List<User> friends = new ArrayList<>();
+        User userOne = getById(userOneId).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + userOneId+ " doesn't exists"));
+        User userTwo = getById(userTwoId).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + userTwoId + " doesn't exists"));
+
+        if (userOne.getFriends() != null) {
+            for (long friendId : userOne.getFriends()) {
+                friends.addAll(userTwo.getFriends().stream()
+                        .filter(x -> x.equals(friendId))
+                        .map(x->getById(x).orElseThrow(() ->
+                                new UserNotFoundException( "user id: " + x + " doesn't exists")))
+                        .collect(Collectors.toList()));
+            }
+        }
+        return friends;
+    }
+
+    @Override
+    public boolean removeFriend(long friendIdOne, long friendIdTwo) {
+
+        User userOne = getById(friendIdOne).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + friendIdOne + " doesn't exists"));
+        User userTwo = getById(friendIdTwo).orElseThrow(() ->
+                new UserNotFoundException( "user id: " + friendIdTwo + " doesn't exists"));
+
+        return userOne.removeFriend(friendIdTwo) && userTwo.removeFriend(friendIdOne);
+    }
 }
