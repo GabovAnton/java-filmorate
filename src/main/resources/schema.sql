@@ -1,4 +1,3 @@
---DROP ALL OBJECTS; --delete all tables
 DROP TABLE IF EXISTS PUBLIC."filmorate.film_likes" CASCADE;
 DROP TABLE IF EXISTS PUBLIC."filmorate.film_genres" CASCADE;
 DROP TABLE IF EXISTS PUBLIC."filmorate.friends" CASCADE;
@@ -13,7 +12,6 @@ CREATE TABLE IF NOT EXISTS PUBLIC."filmorate.films" (
                                                         DESCRIPTION CHARACTER VARYING(200),
                                                         DURATION INTEGER DEFAULT 0 NOT NULL,
                                                         RELEASE_DATE DATE NOT NULL,
-    --RATING ENUM('G','PG','PG13','NC17') NOT NULL,
                                                         RATING_ID INTEGER NOT NULL,
                                                         CONSTRAINT FILMORATE_FILMS_PK PRIMARY KEY (ID),
                                                         CONSTRAINT filmorate_filmname_uniqe

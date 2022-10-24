@@ -54,8 +54,8 @@ public class UserDbStorage implements UserStorage {
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
             return stmt;
         }, keyHolder);
-
-        return getById(keyHolder.getKey().longValue());
+        int createdUserId = keyHolder.getKey().intValue();
+        return getById(createdUserId);
     }
 
     @Override
@@ -133,9 +133,10 @@ String query = "SELECT DISTINCT  U.*  " +
 
     @Override
     public Optional<User> getById(long userId) {
-        return jdbcTemplate
+        Optional<User>  user =jdbcTemplate
                 .query("SELECT * FROM  \"filmorate.users\" WHERE id = ?", new UserMapper(), new Object[]{userId})
                 .stream().findAny();
+        return user;
     }
     @Override
     public boolean removeFriend(long friendIdOne, long friendIdTwo) {

@@ -160,8 +160,7 @@ public class FilmDbStorage implements FilmStorage {
     public boolean addLike(@Valid long userId, @Valid Film film) {
         String sqlQuery = "INSERT INTO \"filmorate.film_likes\"(USER_ID, FILM_ID) " +
                 " VALUES (?, ?)";
-        jdbcTemplate.update(
-                sqlQuery, userId, film.getId());
+
         return jdbcTemplate.update(sqlQuery, userId, film.getId()) > 0;
 
     }
@@ -181,7 +180,7 @@ public class FilmDbStorage implements FilmStorage {
                 " JOIN  \"filmorate.ratings\" AS R ON R.ID =F.RATING_ID " +
                 " LEFT JOIN PUBLIC.\"filmorate.film_likes\" ffl ON F.ID = FFL.FILM_ID " +
                 " GROUP BY F.ID " +
-                " ORDER BY COUNT(ffl.USER_ID) DESC " +
+                " ORDER BY COUNT(ffl.FILM_ID) DESC " +
                 " LIMIT ? ";
         List<Film> films = jdbcTemplate
                 .query(query, new FilmMapper(), number);
@@ -200,6 +199,11 @@ public class FilmDbStorage implements FilmStorage {
                 .orElseThrow(() -> new GenreNotFoundException("genre with id: " + id + " not found"));
 
 
+    }
+
+    public Integer getFilmLikes (int filmId) {
+        String sqlQuery = "SELECT COUNT(*) FROM  \"filmorate.film_likes\" WHERE FILM_ID = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, Integer.class, filmId);
     }
 
     @Override

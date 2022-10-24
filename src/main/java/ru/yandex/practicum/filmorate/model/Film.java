@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Film {
     private int id;
 
