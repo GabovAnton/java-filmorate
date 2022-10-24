@@ -8,16 +8,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.FilmGenreTypeMapper;
 import ru.yandex.practicum.filmorate.dao.FilmMapper;
-import ru.yandex.practicum.filmorate.dao.FilmRatingMapper;
 import ru.yandex.practicum.filmorate.dao.MpaMapper;
-import ru.yandex.practicum.filmorate.exception.DeleteRowException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.MPANotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.MpaDictionary;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
@@ -113,7 +110,6 @@ public class FilmDbStorage implements FilmStorage {
         return getByID(FilmId);
     }
 
-
     @Override
     @Valid
     public Optional<Film> update(Film film) {
@@ -201,7 +197,7 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
-    public Integer getFilmLikes (int filmId) {
+    public Integer getFilmLikes(int filmId) {
         String sqlQuery = "SELECT COUNT(*) FROM  \"filmorate.film_likes\" WHERE FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, Integer.class, filmId);
     }

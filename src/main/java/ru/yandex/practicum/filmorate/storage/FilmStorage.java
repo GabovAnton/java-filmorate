@@ -20,7 +20,6 @@ public interface FilmStorage {
 
     boolean addLike(@Valid long userId, @Valid Film film);
 
-
     boolean removeLike(long userId, int filmId);
 
     List<Film> getTopFilms(int number);

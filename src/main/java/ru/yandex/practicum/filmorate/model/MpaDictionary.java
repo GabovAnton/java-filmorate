@@ -17,7 +17,6 @@ public enum MpaDictionary {
     public static String getMPA(int id) {
         MpaDictionary[] c;
         c = MpaDictionary.values();
-        //TODO доделать!
         String mpaName = String.valueOf(Arrays.stream(c).filter(x->x.id == id).findAny().orElseThrow());
         switch (mpaName){
             case("PG13"):

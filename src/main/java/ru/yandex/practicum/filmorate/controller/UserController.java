@@ -74,7 +74,7 @@ public class UserController {
     public boolean delete(@PathVariable long id, @PathVariable long friendId) {
         boolean result = userService.removeFriend(id, friendId);
         log.debug("friend with id: {} has been deleted from friends of user with id: {} "
-                + (result ? " successfully" : "with error"),friendId, id);
+                + (result ? " successfully" : "with error"), friendId, id);
         return result;
     }
 

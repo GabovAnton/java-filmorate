@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.MpaDictionary;
+import ru.yandex.practicum.filmorate.exception.MPANotFoundException;
+import ru.yandex.practicum.filmorate.model.*;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -105,31 +103,30 @@ public class InMemoryFilmStorage implements FilmStorage {
         return true;
     }
 
-    @Override ////TODO реализовать метод!!!!!
     public Genre getGenreById(int id) {
+        return Arrays.stream(GenreDictionary.values())
+                .filter(x->x.id == id)
+                .map(genre -> new Genre(genre.id, genre.name()))
+                .findAny().orElseThrow(()->new MPANotFoundException(String.format("genre with id: %d not found", id )));
 
-
-        return null;
     }
 
-    @Override ////TODO реализовать метод!!!!!
     public List<Genre> getAllGenres() {
-        return null;
+        return Arrays.stream(GenreDictionary.values())
+                .map(genre -> new Genre(genre.id, genre.name())).collect(Collectors.toList());
     }
 
     public Mpa getMPAById(int id) {
-        Mpa mpa = new Mpa();
-        mpa.name=MpaDictionary.getMPA(id);
-        mpa.id=id;
-        return mpa;
+        return Arrays.stream(MpaDictionary.values())
+                .filter(x->x.id == id)
+                .map(mpa -> new Mpa(mpa.id, mpa.name()))
+                .findAny().orElseThrow(()->new MPANotFoundException(String.format("mpa with id: %d not found", id )));
 
     }
     @Override
     public List<Mpa> getAllMPA() {
-
-        //TODO исправить!
-       // return List.of(MpaDictionary.values());
-        return null;
+        return Arrays.stream(MpaDictionary.values())
+                .map(mpa -> new Mpa(mpa.id, mpa.name())).collect(Collectors.toList());
     }
 
 }

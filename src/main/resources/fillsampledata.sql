@@ -96,3 +96,8 @@ INSERT INTO PUBLIC."filmorate.film_likes" -- добавляем лайк фил�
 (USER_ID, FILM_ID)
 VALUES(SELECT ID FROM PUBLIC."filmorate.users"  WHERE EMAIL = 'agabov@gmail.com',
        SELECT ID FROM PUBLIC."filmorate.films"  WHERE NAME = 'Титаник');
+
+INSERT INTO PUBLIC."filmorate.film_likes" -- добавляем лайк фильму Дикая природа Амазонки
+(USER_ID, FILM_ID)
+VALUES(SELECT ID FROM PUBLIC."filmorate.users"  WHERE EMAIL = 'petya@gmail.com',
+          SELECT ID FROM PUBLIC."filmorate.films"  WHERE NAME = 'Дикая природа Амазонки');

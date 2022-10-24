@@ -84,14 +84,14 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getUserFriends(long id) {
-        String query = "SELECT F.* "+
+        String query = "SELECT F.* " +
                 " FROM \"filmorate.users\" AS U " +
                 " JOIN \"filmorate.friends\" AS FR ON FR.USER_ID =U.ID " +
                 " JOIN \"filmorate.users\" AS F ON F.ID  =FR.FOREIGN_USER_ID " +
                 " WHERE FR.STATUS = 1 AND U.ID = ?  ";
-        List<User> friends =  jdbcTemplate.query(
+        List<User> friends = jdbcTemplate.query(
                 query,
-                new UserMapper(), new SqlParameterValue(Types.INTEGER,  id));
+                new UserMapper(), new SqlParameterValue(Types.INTEGER, id));
 
         return friends;
     }
@@ -100,7 +100,7 @@ public class UserDbStorage implements UserStorage {
     public boolean addFriend(long friendIdOne, long friendIdTwo) {
 
         String query = "INSERT INTO \"filmorate.friends\" (USER_ID, FOREIGN_USER_ID, STATUS) " +
-                " VALUES(SELECT ID FROM PUBLIC.\"filmorate.users\" AS U  WHERE U.ID = ? , "   +
+                " VALUES(SELECT ID FROM PUBLIC.\"filmorate.users\" AS U  WHERE U.ID = ? , " +
                 " SELECT ID FROM PUBLIC.\"filmorate.users\"  AS UF WHERE UF.ID = ?, 1) ";
 
         return jdbcTemplate.update(query, friendIdOne, friendIdTwo) > 0;
@@ -109,21 +109,19 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getMutualFriends(long userOneId, long userTwoId) {
-String query = "SELECT DISTINCT  U.*  " +
-        " FROM " +
-        " \"filmorate.friends\" "+
-        " AS F "+
-        " JOIN " +
-        " \"filmorate.users\" "+
-        " AS U ON U.ID  = F.FOREIGN_USER_ID " +
-        " WHERE F.USER_ID = ? AND F.STATUS = 1 AND F.FOREIGN_USER_ID IN  " +
-        " (SELECT FR.FOREIGN_USER_ID " +
-        " FROM " +
-        " \"filmorate.friends\" "+
-        " AS FR " +
-        " WHERE FR.USER_ID = ? AND FR.STATUS = 1) ";
-
-
+        String query = "SELECT DISTINCT  U.*  " +
+                " FROM " +
+                " \"filmorate.friends\" " +
+                " AS F " +
+                " JOIN " +
+                " \"filmorate.users\" " +
+                " AS U ON U.ID  = F.FOREIGN_USER_ID " +
+                " WHERE F.USER_ID = ? AND F.STATUS = 1 AND F.FOREIGN_USER_ID IN  " +
+                " (SELECT FR.FOREIGN_USER_ID " +
+                " FROM " +
+                " \"filmorate.friends\" " +
+                " AS FR " +
+                " WHERE FR.USER_ID = ? AND FR.STATUS = 1) ";
 
 
         return jdbcTemplate.query(
@@ -133,11 +131,12 @@ String query = "SELECT DISTINCT  U.*  " +
 
     @Override
     public Optional<User> getById(long userId) {
-        Optional<User>  user =jdbcTemplate
+        Optional<User> user = jdbcTemplate
                 .query("SELECT * FROM  \"filmorate.users\" WHERE id = ?", new UserMapper(), new Object[]{userId})
                 .stream().findAny();
         return user;
     }
+
     @Override
     public boolean removeFriend(long friendIdOne, long friendIdTwo) {
         String sqlQuery = "DELETE  FROM \"filmorate.friends\" WHERE USER_ID = ? AND FOREIGN_USER_ID = ?";

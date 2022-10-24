@@ -1,29 +1,21 @@
 package ru.yandex.practicum.filmorate;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.impl.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dao.impl.UserDbStorage;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-
-import javax.validation.Valid;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -151,6 +143,7 @@ class FilmoRateApplicationTests {
                 .hasSize(5);
 
     }
+
     @Test
     public void testCreateFilm() {
         Film localFilm = new Film();
@@ -158,10 +151,8 @@ class FilmoRateApplicationTests {
         localFilm.setDescription("newdescription");
         localFilm.setDuration(120);
         localFilm.setRate(5);
-        localFilm.setReleaseDate( LocalDate.of(2000,05,20));
-        Mpa mpa = new Mpa();
-        mpa.id = 1;
-        mpa.name = MpaDictionary.getMPA(1);
+        localFilm.setReleaseDate(LocalDate.of(2000, 05, 20));
+        Mpa mpa = new Mpa(1, MpaDictionary.getMPA(1));
         localFilm.setMpa(mpa);
         Optional<Film> newFilm = filmDbStorage.create(localFilm);
 
@@ -171,18 +162,17 @@ class FilmoRateApplicationTests {
                         assertThat(film).hasFieldOrPropertyWithValue("name", "NewFilm")
                 );
     }
+
     @Test
-    public void testFilmUpdate(){
+    public void testFilmUpdate() {
         Film localFilm = new Film();
         localFilm.setName("NewFilm");
         localFilm.setDescription("newdescription");
         localFilm.setDuration(120);
         localFilm.setRate(5);
         localFilm.setId(1);
-        localFilm.setReleaseDate( LocalDate.of(2000,05,20));
-        Mpa mpa = new Mpa();
-        mpa.id = 1;
-        mpa.name = MpaDictionary.getMPA(1);
+        localFilm.setReleaseDate(LocalDate.of(2000, 05, 20));
+        Mpa mpa = new Mpa(1, MpaDictionary.getMPA(1));
         localFilm.setMpa(mpa);
         Optional<Film> updatedFilm = filmDbStorage.update(localFilm);
 
@@ -193,6 +183,7 @@ class FilmoRateApplicationTests {
                 );
 
     }
+
     @Test
     public void testGetFilmById() {
         Optional<Film> filmFromDB = filmDbStorage.getByID(1);
@@ -204,7 +195,7 @@ class FilmoRateApplicationTests {
     }
 
     @Test
-    public void testAddLikeToFilm(){
+    public void testAddLikeToFilm() {
         Optional<Film> filmDB = filmDbStorage.getByID(1);
         assertThat(filmDB)
                 .isPresent()
@@ -212,7 +203,7 @@ class FilmoRateApplicationTests {
                         assertThat(film).hasFieldOrPropertyWithValue("name", "Титаник")
                 );
 
-        boolean result = filmDbStorage.addLike(3L,filmDB.get());
+        boolean result = filmDbStorage.addLike(3L, filmDB.get());
         assertThat(result)
                 .isTrue();
 
@@ -233,58 +224,65 @@ class FilmoRateApplicationTests {
                 .isEqualTo(1);
     }
 
-@Test
+    @Test
     public void testGetTopFilms() {
-    List<Film> TopFilms = filmDbStorage.getTopFilms(3);
-    assertThat(TopFilms)
-            .isNotEmpty()
-            .hasSize(3);
-}
+        List<Film> TopFilms = filmDbStorage.getTopFilms(3);
+        List<String> TopExpectedFilms = List.of("Титаник", "Я иду искать", "Дикая природа Амазонки");
 
-@Test
+        assertThat(TopFilms)
+                .isNotEmpty()
+                .hasSize(3)
+                .extracting(Film::getName)
+                .containsExactlyElementsOf(TopExpectedFilms);
+
+    }
+
+    @Test
     public void testDeleteFilm() {
-    boolean result =filmDbStorage.deleteFilm(1);
+        boolean result = filmDbStorage.deleteFilm(1);
 
 
-    assertThat(result)
-            .isTrue();;
+        assertThat(result)
+                .isTrue();
+        ;
 
-    Optional<Film> filmFromDB = filmDbStorage.getByID(1);
-    assertThat(filmFromDB)
-            .isEmpty();
-}
+        Optional<Film> filmFromDB = filmDbStorage.getByID(1);
+        assertThat(filmFromDB)
+                .isEmpty();
+    }
 
-@Test
-    public void testGetGenreById(){
+    @Test
+    public void testGetGenreById() {
 
-    String genre = filmDbStorage.getGenreById(1).name;
+        String genre = filmDbStorage.getGenreById(1).name;
 
-    assertThat(genre)
-            .isEqualTo("Комедия");
-}
+        assertThat(genre)
+                .isEqualTo("Комедия");
+    }
 
-@Test
+    @Test
     public void testGetAllGenres() {
-    List<Genre> genres = filmDbStorage.getAllGenres();
-    assertThat(genres)
-            .isNotEmpty()
-            .hasSize(6);
-}
+        List<Genre> genres = filmDbStorage.getAllGenres();
+        assertThat(genres)
+                .isNotEmpty()
+                .hasSize(6);
+    }
 
-@Test
+    @Test
     public void testGetMPAById() {
-    String mpa = filmDbStorage.getMPAById(1).name;
-    assertThat(mpa)
-            .isEqualTo("G");
-}
-@Test
-    public void testGetAllMpa(){
+        String mpa = filmDbStorage.getMPAById(1).name;
+        assertThat(mpa)
+                .isEqualTo("G");
+    }
 
-    List<Mpa>  allMpa = filmDbStorage.getAllMPA();
-    assertThat(allMpa)
-            .isNotEmpty()
-            .hasSize(5);
-}
+    @Test
+    public void testGetAllMpa() {
+
+        List<Mpa> allMpa = filmDbStorage.getAllMPA();
+        assertThat(allMpa)
+                .isNotEmpty()
+                .hasSize(5);
+    }
 
 
 }
