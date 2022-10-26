@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.model;
 import java.util.Arrays;
 
 public enum GenreDictionary {
-    Комедия(1),
-    Драма(2),
-    Мультфильм(3),
-    Триллер(4),
-    Документальный(5),
-    Боевик(6);
+    Comedy(1),
+    Drama(2),
+    Cartoon(3),
+    Thriller(4),
+    Documentary(5),
+    Action(6);
 
     public int id;
 

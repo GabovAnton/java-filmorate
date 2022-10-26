@@ -26,46 +26,70 @@ public class UserService {
 
     public boolean removeFriend(long friendIdOne, long friendIdTwo) {
 
-     return userStorage.removeFriend(friendIdOne,friendIdTwo);
+        boolean result = userStorage.removeFriend(friendIdOne, friendIdTwo);
+        log.debug("friend id: {}",
+                result ? "deleted successfully from user id: {}" : "can't be deleted from user id: {}",
+                friendIdTwo, friendIdOne );
+        return result;
     }
 
     public boolean addFriend(long friendIdOne, long friendIdTwo) {
-        return userStorage.addFriend(friendIdOne, friendIdTwo);
+        boolean result = userStorage.addFriend(friendIdOne, friendIdTwo);
+        log.debug("friend id: {}",
+                result ? "added successfully to user id: {}" : "can't be added to user id: {}",
+                friendIdTwo, friendIdOne );
+        return result;
     }
 
     public Optional<User> getUser(long id) {
-        return userStorage.getById(id);
+        Optional<User> user = userStorage.getById(id);
+        log.debug("requested user with id: {}", user.isPresent() ? "returned successfully" : "doesn't exist", id );
+
+        return user;
     }
 
     public List<User> getAll() {
-        return userStorage.getAll();
+        List<User> allUsers = userStorage.getAll();
+        log.debug("all films requested, returned: {}", allUsers.size());
+        return allUsers;
     }
 
     public User create(User user) {
-        return userStorage.create(user)
+        User createdUser = userStorage.create(user)
                 .orElseThrow(() ->
                         new EntityNotFoundException("newly created user with id: " + user.getId() +
                                 " doesn't exists in storage"));
+        log.debug("user: {} created successfully" , createdUser);
+
+        return createdUser;
+
     }
 
     public List<User> getMutualFriends(long userOneId, long userTwoId) {
+        List<User> mutualFriends = userStorage.getMutualFriends(userOneId, userTwoId);
+        log.debug("mutual friends  requested, returned: {}", mutualFriends.size());
 
-        return userStorage.getMutualFriends(userOneId,userTwoId);
+        return mutualFriends;
     }
 
     public List<User> getFriends(long id) {
-     return  userStorage.getUserFriends(id);
+        List<User> userFriends = userStorage.getUserFriends(id);
+        log.debug("user friends requested for user id: {}, returned: {}", id, userFriends.size());
+
+        return  userFriends;
     }
 
 
 
     public User update(User user) {
-        return userStorage
-                .update(user).orElseThrow(() -> new EntityNotFoundException("newly created user with id: " + user.getId() +
-        " doesn't exists in storage"));
+        User updatedUser = userStorage
+                .update(user)
+                .orElseThrow(() -> new EntityNotFoundException("newly created user with id: " + user.getId() +
+                        " doesn't exists in storage"));
+        log.debug("user: {} updated successfully" , updatedUser);
+
+        return updatedUser;
+
     }
 
-    Optional<User> getByEmail(@RequestBody String email) {
-        return userStorage.getByEmail(email);
-    }
 }

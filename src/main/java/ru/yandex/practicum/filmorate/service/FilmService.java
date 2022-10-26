@@ -31,9 +31,10 @@ public class FilmService {
                     log.debug("film with id: {} doesn't exist, ", filmId);
                     throw new EntityNotFoundException("film id: " + filmId + "doesn't exist");
                 }));
-       if (!result) {
-           log.debug("error while adding like to film with id: {} from user with id: {} ", filmId, userId);
-       }
+
+        log.debug("adding like to film with id: {} from user with id: {}", result ? "added successfully" :
+                "can't be added because of error", filmId, userId );
+
         return result;
 
     }
@@ -55,41 +56,67 @@ public class FilmService {
     }
 
     public List<Film> getTopPopularFilms(int number) {
-        return filmStorage.getTopFilms(number);
+        List<Film> topFilms = filmStorage.getTopFilms(number);
+        log.debug("all films requested, returned: {}", topFilms.size());
+
+        return topFilms;
     }
 
     public Optional<Film> create(Film film) {
-        return filmStorage.create(film);
+        Optional<Film> filmCreated = filmStorage.create(film);
+        log.debug("film: {}", filmCreated.isPresent() ? "created successfully" : "can't be created", film );
+        return filmCreated;
+
     }
 
     public Film getByID(Integer id) {
-        return filmStorage
+
+        Film film = filmStorage
                 .getByID(id).orElseThrow(() -> new EntityNotFoundException("film with id: " + id + " doesn't exist"));
+        log.debug("film id: {} requested, returned {}" , id,  film);
+        return film;
 
     }
 
     public @Valid Optional<Film> update(Film film) {
-        return filmStorage.update(film);
+        Optional<Film> updatedFilm = filmStorage.update(film);
+        log.debug("film: {}", updatedFilm.isPresent() ? "updated successfully" : "can't be updated", film );
+
+        return updatedFilm;
     }
 
     public boolean removeFilm(int id) {
-        return filmStorage.deleteFilm(id);
+        boolean result = filmStorage.deleteFilm(id);
+        log.debug("film id: {}", result ? "deleted successfully" : "can't be deleted", id );
+        return result;
     }
 
     public Genre getGenreById(int id) {
-        return filmStorage.getGenreById(id);
+        Genre genre = filmStorage.getGenreById(id);
+        log.debug("genre with id: {} requested, returned : {}", id, genre);
+
+        return genre;
     }
 
     public Mpa getMPAById(int id) {
-        return filmStorage.getMPAById(id);
+        Mpa mpa = filmStorage.getMPAById(id);
+        log.debug("mpa with id: {} requested, returned : {}", id, mpa);
+        return mpa;
     }
 
     public List<Genre> getAllGenres() {
-        return filmStorage.getAllGenres();
+        List<Genre> allGenres = filmStorage.getAllGenres();
+        log.debug("all genres requested, returned : {}", allGenres.size());
+
+        return allGenres;
     }
 
     public List<Mpa> getAllMPA() {
-        return filmStorage.getAllMPA();
+
+        List<Mpa> allMPA = filmStorage.getAllMPA();
+        log.debug("all mpa requested, returned : {}", allMPA.size());
+
+        return allMPA;
     }
 
 }
