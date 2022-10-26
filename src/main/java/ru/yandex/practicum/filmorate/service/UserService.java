@@ -1,17 +1,19 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserStorage userStorage;
@@ -42,7 +44,8 @@ public class UserService {
     public User create(User user) {
         return userStorage.create(user)
                 .orElseThrow(() ->
-                        new UserNotFoundException("newly created user doesn't exists in storage", user.getId()));
+                        new EntityNotFoundException("newly created user with id: " + user.getId() +
+                                " doesn't exists in storage"));
     }
 
     public List<User> getMutualFriends(long userOneId, long userTwoId) {
@@ -58,7 +61,8 @@ public class UserService {
 
     public User update(User user) {
         return userStorage
-                .update(user).orElseThrow(() -> new UserNotFoundException("user doesn't exists", user.getId()));
+                .update(user).orElseThrow(() -> new EntityNotFoundException("newly created user with id: " + user.getId() +
+        " doesn't exists in storage"));
     }
 
     Optional<User> getByEmail(@RequestBody String email) {

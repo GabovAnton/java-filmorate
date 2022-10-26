@@ -41,29 +41,14 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserPostNotFoundException(final UserNotFoundException e) {
+    public ErrorResponse handleEntityNotFoundException(final EntityNotFoundException e) {
         log.debug(e.getMessage());
         return new ErrorResponse(
                 "error", e.getMessage()
         );
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleFilmPostNotFoundException(final FilmNotFoundException e) {
-        log.debug(e.getMessage());
-        return new ErrorResponse(
-                "error", e.getMessage()
-        );
-    }
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleGeneralRuntimeException(final LikeNotFoundException e) {
-        log.debug(e.getMessage());
-        return new ErrorResponse(
-                "error", e.getMessage()
-        );
-    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleGeneralRuntimeException(final RuntimeException e) {

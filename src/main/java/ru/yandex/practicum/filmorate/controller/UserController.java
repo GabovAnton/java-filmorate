@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -28,7 +28,7 @@ public class UserController {
         Optional<User> user = userService.getUser(id);
         log.debug("user with id: {} requested, returned result: {}", id, user);
         if (!user.isPresent()) {
-            throw new UserNotFoundException("user doesn't exists");
+            throw new EntityNotFoundException("user with id: " + id + " doesn't exists");
         }
         return user;
     }

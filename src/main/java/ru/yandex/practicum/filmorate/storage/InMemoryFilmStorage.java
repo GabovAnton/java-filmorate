@@ -2,9 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
-import ru.yandex.practicum.filmorate.exception.MPANotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 
 import javax.validation.ValidationException;
@@ -54,7 +53,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                         films.remove(f);
                         films.add(film);
                     }, () -> {
-                        throw new FilmNotFoundException("film doesn't exist");
+                        throw new EntityNotFoundException("film doesn't exist");
                     });
             log.debug("film {} successfully updated", film);
 
@@ -84,7 +83,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         Film film = getByID(filmId)
                 .stream()
                 .findAny()
-                .orElseThrow(()->new FilmNotFoundException("film with id +" + filmId + " not found" ));
+                .orElseThrow(()->new EntityNotFoundException("film with id +" + filmId + " not found" ));
         return film.removeLike(userId);
     }
 
@@ -107,7 +106,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Arrays.stream(GenreDictionary.values())
                 .filter(x->x.id == id)
                 .map(genre -> new Genre(genre.id, genre.name()))
-                .findAny().orElseThrow(()->new MPANotFoundException(String.format("genre with id: %d not found", id )));
+                .findAny().orElseThrow(()->new EntityNotFoundException(String.format("genre with id: %d not found", id )));
 
     }
 
@@ -120,7 +119,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Arrays.stream(MpaDictionary.values())
                 .filter(x->x.id == id)
                 .map(mpa -> new Mpa(mpa.id, mpa.name()))
-                .findAny().orElseThrow(()->new MPANotFoundException(String.format("mpa with id: %d not found", id )));
+                .findAny().orElseThrow(()->new EntityNotFoundException(String.format("mpa with id: %d not found", id )));
 
     }
     @Override

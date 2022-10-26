@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 
-public class GenreNotFoundException extends RuntimeException {
-    public GenreNotFoundException(String s) {
+public class EntityNotFoundException extends RuntimeException {
+    public EntityNotFoundException(String s) {
         super(s);
     }
 }

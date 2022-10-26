@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.MpaDictionary;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class FilmService {
 
     private final FilmStorage filmStorage;
@@ -26,21 +26,31 @@ public class FilmService {
     }
 
     public boolean addLike(int filmId, long userId) {
-        return filmStorage.addLike(userId,
+        boolean result = filmStorage.addLike(userId,
                 filmStorage.getByID(filmId).orElseThrow(() -> {
-                    throw new FilmNotFoundException("film id: " + filmId + "doesn't exist");
+                    log.debug("film with id: {} doesn't exist, ", filmId);
+                    throw new EntityNotFoundException("film id: " + filmId + "doesn't exist");
                 }));
+       if (!result) {
+           log.debug("error while adding like to film with id: {} from user with id: {} ", filmId, userId);
+       }
+        return result;
+
     }
 
     public List<Film> getAll() {
-        return filmStorage.getAll();
+        List<Film> allFilms = filmStorage.getAll();
+        log.debug("all films requested, returned: {}", allFilms.size());
+        return allFilms;
     }
 
     public boolean removeLike(int filmId, long userId) {
         if (filmStorage.removeLike(userId, filmId)) {
+            log.debug("like removed  successfully from film with id: {} and user with id: {} ", filmId, userId);
             return true;
         } else {
-            throw new LikeNotFoundException("like for filmId: " + filmId + " and userId: " + userId + " not found");
+            log.debug("error while removing like to film with id: {} from user with id: {} ", filmId, userId);
+            throw new EntityNotFoundException("like for filmId: " + filmId + " and userId: " + userId + " not found");
         }
     }
 
@@ -54,7 +64,7 @@ public class FilmService {
 
     public Film getByID(Integer id) {
         return filmStorage
-                .getByID(id).orElseThrow(() -> new FilmNotFoundException("film with id: " + id + " doesn't exist"));
+                .getByID(id).orElseThrow(() -> new EntityNotFoundException("film with id: " + id + " doesn't exist"));
 
     }
 

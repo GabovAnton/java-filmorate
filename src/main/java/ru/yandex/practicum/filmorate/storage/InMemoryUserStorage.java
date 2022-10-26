@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class InMemoryUserStorage implements UserStorage {
                     users.remove(u);
                     users.add(user);
                 }, () -> {
-                    throw new UserNotFoundException("user doesn't exists", user.getId());
+                    throw new EntityNotFoundException("user  with id: " + user.getId() +" doesn't exists");
                 });
 
         log.debug("user {} successfully updated", user);
@@ -79,17 +79,17 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> getUserFriends(long id) {
         User user = getById(id).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + id + " doesn't exists"));
+                new EntityNotFoundException( "user id: " + id + " doesn't exists"));
 
         return user.getFriends().stream().map(x->getById(x).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + x + " doesn't exists"))).collect(Collectors.toList());    }
+                new EntityNotFoundException( "user id: " + x + " doesn't exists"))).collect(Collectors.toList());    }
 
     @Override
     public boolean addFriend(long friendIdOne, long friendIdTwo) {
         return addMutualFriends(getById(friendIdOne).orElseThrow(() ->
-                        new UserNotFoundException( "user id: " + friendIdOne + " doesn't exists")),
+                        new EntityNotFoundException( "user id: " + friendIdOne + " doesn't exists")),
                 getById(friendIdTwo).orElseThrow(() ->
-                        new UserNotFoundException( "user id: " + friendIdTwo + " doesn't exists")));
+                        new EntityNotFoundException( "user id: " + friendIdTwo + " doesn't exists")));
     }
 
     private Boolean addMutualFriends(User one, User two) {
@@ -102,16 +102,16 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getMutualFriends(long userOneId, long userTwoId) {
         List<User> friends = new ArrayList<>();
         User userOne = getById(userOneId).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + userOneId+ " doesn't exists"));
+                new EntityNotFoundException( "user id: " + userOneId+ " doesn't exists"));
         User userTwo = getById(userTwoId).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + userTwoId + " doesn't exists"));
+                new EntityNotFoundException( "user id: " + userTwoId + " doesn't exists"));
 
         if (userOne.getFriends() != null) {
             for (long friendId : userOne.getFriends()) {
                 friends.addAll(userTwo.getFriends().stream()
                         .filter(x -> x.equals(friendId))
                         .map(x->getById(x).orElseThrow(() ->
-                                new UserNotFoundException( "user id: " + x + " doesn't exists")))
+                                new EntityNotFoundException( "user id: " + x + " doesn't exists")))
                         .collect(Collectors.toList()));
             }
         }
@@ -122,9 +122,9 @@ public class InMemoryUserStorage implements UserStorage {
     public boolean removeFriend(long friendIdOne, long friendIdTwo) {
 
         User userOne = getById(friendIdOne).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + friendIdOne + " doesn't exists"));
+                new EntityNotFoundException( "user id: " + friendIdOne + " doesn't exists"));
         User userTwo = getById(friendIdTwo).orElseThrow(() ->
-                new UserNotFoundException( "user id: " + friendIdTwo + " doesn't exists"));
+                new EntityNotFoundException( "user id: " + friendIdTwo + " doesn't exists"));
 
         return userOne.removeFriend(friendIdTwo) && userTwo.removeFriend(friendIdOne);
     }

@@ -1,20 +1,15 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.FilmDBFormat;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,16 +43,16 @@ public class FilmController {
     }
 
     @PutMapping()
-    public  Optional<Film> update(@Valid @RequestBody Film film) {
+    public Optional<Film> update(@Valid @RequestBody Film film) {
         Optional<Film> updatedFilm = filmService.update(film);
-         if (updatedFilm.isPresent()) {
-             log.debug("film updated: {} ->  {}", film, updatedFilm);
-         }
+        if (updatedFilm.isPresent()) {
+            log.debug("film updated: {} ->  {}", film, updatedFilm);
+        }
         return updatedFilm;
     }
 
     @GetMapping("{id}")
-    public @Valid  Film getFilmById(@PathVariable int id) {
+    public @Valid Film getFilmById(@PathVariable int id) {
         Film requestedFilm = filmService.getByID(id);
         log.debug("film with id: {} requested, returned result: {}", id, requestedFilm);
         return requestedFilm;
@@ -92,42 +87,6 @@ public class FilmController {
 
         return topPopularFilms;
     }
-
-    private static class FilmDBFormat {
-        @NotBlank
-        @Size(max = 100)
-        public String name;
-        @NotNull
-        public String releaseDate;
-        @Size(max = 200)
-        public String description;
-        @NonNull
-        @Positive
-        public int duration;
-        @NonNull
-        @Positive
-        @Value("${some.key:0}")
-        public int rate;
-        @NotNull
-        public Mpa mpa;
-
-        public ArrayList<Genre> genres;
-
-        Film getFilm() {
-            Film film = new Film();
-            film.setName(name);
-            film.setReleaseDate(LocalDate.parse(releaseDate));
-            film.setDuration(duration);
-            film.setMpa(mpa);
-            film.setDescription(description);
-            film.setRate(rate);
-            if (genres != null) {
-                film.setGenres(genres);
-            }
-            return  film;
-        }
-    }
-
 
 
 }

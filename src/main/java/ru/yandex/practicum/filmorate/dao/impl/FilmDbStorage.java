@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.FilmGenreTypeMapper;
 import ru.yandex.practicum.filmorate.dao.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.MpaMapper;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
-import ru.yandex.practicum.filmorate.exception.MPANotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -31,6 +29,11 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private int batchSize = 30;
+    private static final String FILMS_TABLE = "\"filmorate.films\"";
+    private static final String RATINGS_TABLE = "\"filmorate.ratings\"";
+    private static final String FILM_GENRES_TABLE = "\"filmorate.film_genres\"";
+    private static final String GENRES_TABLE = "\"filmorate.genres\"";
+    private static final String FILM_LIKES_TABLE = "\"filmorate.film_likes\"";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -41,8 +44,8 @@ public class FilmDbStorage implements FilmStorage {
 
         List<Film> films = jdbcTemplate
                 .query("SELECT F.*, R.NAME AS RATING_NAME " +
-                        " FROM \"filmorate.films\" AS F " +
-                        " JOIN  \"filmorate.ratings\" AS R ON R.ID =F.RATING_ID ", new FilmMapper());
+                        " FROM" + FILMS_TABLE + " AS F " +
+                        " JOIN  " + RATINGS_TABLE + " AS R ON R.ID =F.RATING_ID ", new FilmMapper());
 
         films.forEach(x -> x.setGenres(getGenres(x.getId())));
 
@@ -51,8 +54,8 @@ public class FilmDbStorage implements FilmStorage {
 
     private List<Genre> getGenres(int filmId) {
         return new ArrayList<>(jdbcTemplate
-                .query("SELECT * FROM  \"filmorate.film_genres\" AS FG " +
-                                " JOIN \"filmorate.genres\" AS G ON FG.GENRE_ID = G.ID " +
+                .query("SELECT * FROM  " + FILM_GENRES_TABLE + " AS FG " +
+                                " JOIN " + GENRES_TABLE +"  AS G ON FG.GENRE_ID = G.ID " +
                                 " WHERE FILM_ID = ? ",
                         new FilmGenreTypeMapper(),
                         new Object[]{filmId}));
@@ -65,8 +68,8 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate
                 .query("SELECT F.*, R.NAME AS RATING_NAME " +
-                                " FROM \"filmorate.films\" AS F " +
-                                " JOIN  \"filmorate.ratings\" AS R ON R.ID =F.RATING_ID " +
+                                " FROM" + FILMS_TABLE  + " AS F " +
+                                " JOIN  " + RATINGS_TABLE + " AS R ON R.ID =F.RATING_ID " +
                                 " WHERE F.ID = ?",
                         new FilmMapper(getGenres(id)), new Object[]{id})
                 .stream().findAny();
@@ -76,7 +79,8 @@ public class FilmDbStorage implements FilmStorage {
     @Valid
     public Optional<Film> create(@Valid @RequestBody Film film) {
 
-        String sqlQueryInsertFilm = "INSERT INTO \"filmorate.films\" (NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID) " +
+        String sqlQueryInsertFilm = "INSERT INTO " + FILMS_TABLE +
+                " (NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -93,7 +97,7 @@ public class FilmDbStorage implements FilmStorage {
         int FilmId = Objects.requireNonNull(keyHolder.getKey()).intValue();
 
         if (film.getGenres() != null) {
-            String sqlQueryInsertGenres = "INSERT INTO \"filmorate.film_genres\" (GENRE_ID, FILM_ID) " +
+            String sqlQueryInsertGenres = "INSERT INTO " + FILM_GENRES_TABLE + " (GENRE_ID, FILM_ID) " +
                     "VALUES (?, ?)";
 
             List<Integer> genres = film.getGenres().stream().map(x -> x.id).collect(Collectors.toList());
@@ -113,7 +117,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Valid
     public Optional<Film> update(Film film) {
-        String sqlQueryUpdateFilm = "UPDATE  \"filmorate.films\" SET NAME =?, " +
+        String sqlQueryUpdateFilm = "UPDATE  " + FILMS_TABLE + " SET NAME =?, " +
                 "DESCRIPTION =?, DURATION = ?, RELEASE_DATE = ?, RATING_ID = ?" +
                 " WHERE ID = ?";
 
@@ -123,14 +127,14 @@ public class FilmDbStorage implements FilmStorage {
                         film.getDuration(), Date.valueOf(film.getReleaseDate()), film.getMpa().id, film.getId()) > 0) {
 
 
-            String DeleteFilmGenresQuery = "DELETE FROM \"filmorate.film_genres\" WHERE FILM_ID = ? ";
+            String DeleteFilmGenresQuery = "DELETE FROM " + FILM_GENRES_TABLE + " WHERE FILM_ID = ? ";
 
             jdbcTemplate.update(DeleteFilmGenresQuery, film.getId());
 
 
             if (film.getGenres() != null) {
 
-                String sqlQueryInsertGenres = "INSERT INTO \"filmorate.film_genres\" (GENRE_ID, FILM_ID)  " +
+                String sqlQueryInsertGenres = "INSERT INTO " + FILM_GENRES_TABLE + " (GENRE_ID, FILM_ID)  " +
                         "VALUES (?, ?)";
 
                 List<Integer> genres = film.getGenres().stream().map(x -> x.id).distinct().collect(Collectors.toList());
@@ -146,7 +150,7 @@ public class FilmDbStorage implements FilmStorage {
 
             return getByID(film.getId());
         } else {
-            throw new FilmNotFoundException("can't update film with id:  " + film.getId());
+            throw new EntityNotFoundException("can't update film with id:  " + film.getId());
         }
 
 
@@ -154,7 +158,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public boolean addLike(@Valid long userId, @Valid Film film) {
-        String sqlQuery = "INSERT INTO \"filmorate.film_likes\"(USER_ID, FILM_ID) " +
+        String sqlQuery = "INSERT INTO " + FILM_LIKES_TABLE + " (USER_ID, FILM_ID) " +
                 " VALUES (?, ?)";
 
         return jdbcTemplate.update(sqlQuery, userId, film.getId()) > 0;
@@ -163,7 +167,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public boolean removeLike(long userId, int filmId) {
-        String sqlQuery = "DELETE FROM \"filmorate.film_likes\" WHERE USER_ID = ? AND FILM_ID = ?";
+        String sqlQuery = "DELETE FROM " + FILM_LIKES_TABLE + " WHERE USER_ID = ? AND FILM_ID = ?";
 
         return jdbcTemplate.update(sqlQuery, userId, filmId) > 0;
     }
@@ -172,9 +176,9 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getTopFilms(int number) {
 
         String query = "SELECT F.*,  R.NAME AS RATING_NAME " +
-                " FROM PUBLIC.\"filmorate.films\" AS F " +
-                " JOIN  \"filmorate.ratings\" AS R ON R.ID =F.RATING_ID " +
-                " LEFT JOIN PUBLIC.\"filmorate.film_likes\" ffl ON F.ID = FFL.FILM_ID " +
+                " FROM " + FILMS_TABLE + " AS F " +
+                " JOIN  " + RATINGS_TABLE + " AS R ON R.ID =F.RATING_ID " +
+                " LEFT JOIN " + FILM_LIKES_TABLE + " ffl ON F.ID = FFL.FILM_ID " +
                 " GROUP BY F.ID " +
                 " ORDER BY COUNT(ffl.FILM_ID) DESC " +
                 " LIMIT ? ";
@@ -186,47 +190,47 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Genre getGenreById(int id) {
-        String sqlQuery = "SELECT * FROM  \"filmorate.genres\" WHERE id = ?";
+        String sqlQuery = "SELECT * FROM  " + GENRES_TABLE + " WHERE id = ?";
 
         return jdbcTemplate
                 .query(sqlQuery, new FilmGenreTypeMapper(), new Object[]{id})
                 .stream()
                 .findAny()
-                .orElseThrow(() -> new GenreNotFoundException("genre with id: " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("genre with id: " + id + " not found"));
 
 
     }
 
     public Integer getFilmLikes(int filmId) {
-        String sqlQuery = "SELECT COUNT(*) FROM  \"filmorate.film_likes\" WHERE FILM_ID = ?";
+        String sqlQuery = "SELECT COUNT(*) FROM  " + FILM_LIKES_TABLE + " WHERE FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, Integer.class, filmId);
     }
 
     @Override
     public List<Genre> getAllGenres() {
         return jdbcTemplate
-                .query("SELECT * FROM  \"filmorate.genres\"  ORDER BY  ID", new FilmGenreTypeMapper());
+                .query("SELECT * FROM  " + GENRES_TABLE + "  ORDER BY  ID", new FilmGenreTypeMapper());
     }
 
     @Override
     public List<Mpa> getAllMPA() {
         return jdbcTemplate
-                .query("SELECT * FROM  \"filmorate.ratings\"", new MpaMapper());
+                .query("SELECT * FROM  "+ RATINGS_TABLE , new MpaMapper());
     }
 
     @Override
     public Mpa getMPAById(int id) {
-        String sqlQuery = "SELECT * FROM  \"filmorate.ratings\" WHERE id = ?";
+        String sqlQuery = "SELECT * FROM  " + RATINGS_TABLE + " WHERE id = ?";
 
         return jdbcTemplate
                 .query(sqlQuery, new MpaMapper(), new Object[]{id})
-                .stream().findAny().orElseThrow(() -> new MPANotFoundException("MPA with id: " + id + " not found"));
+                .stream().findAny().orElseThrow(() -> new EntityNotFoundException("MPA with id: " + id + " not found"));
 
     }
 
     @Override
     public boolean deleteFilm(int id) {
-        String sqlQuery = "DELETE FROM \"filmorate.films\" where ID = ?";
+        String sqlQuery = "DELETE FROM " + FILMS_TABLE + " where ID = ?";
         return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
-import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -57,7 +57,7 @@ public class Film {
             likes.remove(userId);
             return true;
         } else {
-            throw new LikeNotFoundException("Like for user id: " + userId + " not found");
+            throw new EntityNotFoundException("Like for user id: " + userId + " not found");
         }
     }
 
