@@ -28,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<Film> create(Film film) {
-        if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
+
            int newFilmId = ++id;
            film.setId(newFilmId);
             films.stream().filter(x -> x.equals(film))
@@ -38,16 +38,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
             log.debug("film {} successfully added", film);
             return getByID(newFilmId);
-        } else {
-            log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
-            throw new FilmorateValidationException("Provided release date: '" + film.getReleaseDate()
-                    + "' doesn't match criteria");
-        }
+
     }
 
     @Override
     public Optional<Film> update(Film film) {
-        if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
             films.stream().filter(x -> x.getId() == film.getId())
                     .findAny().ifPresentOrElse(f -> {
                         films.remove(f);
@@ -59,11 +54,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
             return getByID(film.getId());
 
-        } else {
-            log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
-            throw new ValidationException("Provided release date: '" + film.getReleaseDate()
-                    + "' doesn't match criteria");
-        }
+
     }
 
     @Override

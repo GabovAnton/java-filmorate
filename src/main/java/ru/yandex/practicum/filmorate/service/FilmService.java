@@ -5,12 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +42,10 @@ public class FilmService {
 
     }
 
+    private boolean ifRealiseDateMatchCriteria(LocalDate date) {
+        return date != null && date.isAfter(LocalDate.of(1895, 12, 27));
+    }
+
     public List<Film> getAll() {
         List<Film> allFilms = filmStorage.getAll();
         log.debug("all films requested, returned: {}", allFilms.size());
@@ -63,9 +70,16 @@ public class FilmService {
     }
 
     public Optional<Film> create(Film film) {
-        Optional<Film> filmCreated = filmStorage.create(film);
-        log.debug("film: {}", filmCreated.isPresent() ? "created successfully" : "can't be created", film );
-        return filmCreated;
+        if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
+
+            Optional<Film> filmCreated = filmStorage.create(film);
+            log.debug("film: {}", filmCreated.isPresent() ? "created successfully" : "can't be created", film);
+            return filmCreated;
+        } else {
+            log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
+            throw new FilmorateValidationException("Provided release date: '" + film.getReleaseDate()
+                    + "' doesn't match criteria");
+        }
 
     }
 
@@ -79,10 +93,16 @@ public class FilmService {
     }
 
     public @Valid Optional<Film> update(Film film) {
-        Optional<Film> updatedFilm = filmStorage.update(film);
+        if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
+            Optional<Film> updatedFilm = filmStorage.update(film);
         log.debug("film: {}", updatedFilm.isPresent() ? "updated successfully" : "can't be updated", film );
 
         return updatedFilm;
+        } else {
+            log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
+            throw new ValidationException("Provided release date: '" + film.getReleaseDate()
+                    + "' doesn't match criteria");
+        }
     }
 
     public boolean removeFilm(int id) {
