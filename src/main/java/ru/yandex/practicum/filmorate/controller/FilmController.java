@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmDBFormat;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -30,22 +32,28 @@ public class FilmController {
     }
 
     @PostMapping()
-    public @Valid Film create(@Valid @RequestBody Film film) {
-        Film newFilm = filmService.create(film);
+    public @Valid Optional<Film> create(@Valid @RequestBody FilmDBFormat filmDBFormat) throws JsonProcessingException {
+
+        Optional<Film> newFilm = filmService.create(filmDBFormat.getFilm());
         log.debug("new film created: {}", newFilm);
+        if (newFilm.isPresent()) {
+            log.debug("new film created: {}", newFilm);
+        }
         return newFilm;
     }
 
     @PutMapping()
-    public @Valid Film update(@Valid @RequestBody Film film) {
-        Film updatedFilm = filmService.update(film);
-        log.debug("film updated: {} ->  {}", film, updatedFilm);
+    public Optional<Film> update(@Valid @RequestBody Film film) {
+        Optional<Film> updatedFilm = filmService.update(film);
+        if (updatedFilm.isPresent()) {
+            log.debug("film updated: {} ->  {}", film, updatedFilm);
+        }
         return updatedFilm;
     }
 
     @GetMapping("{id}")
-    public Optional<Film> getFilmById(@PathVariable int id) {
-        Optional<Film> requestedFilm = Optional.ofNullable(filmService.getByID(id));
+    public @Valid Film getFilmById(@PathVariable int id) {
+        Film requestedFilm = filmService.getByID(id);
         log.debug("film with id: {} requested, returned result: {}", id, requestedFilm);
         return requestedFilm;
     }
@@ -79,5 +87,6 @@ public class FilmController {
 
         return topPopularFilms;
     }
+
 
 }

@@ -2,16 +2,13 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmorateValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.*;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,51 +27,40 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(Film film) {
-        if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
-            film.setId(++id);
+    public Optional<Film> create(Film film) {
 
+           int newFilmId = ++id;
+           film.setId(newFilmId);
             films.stream().filter(x -> x.equals(film))
                     .findAny().ifPresentOrElse(u -> {
                         throw new ValidationException("film already exists");
                     }, () -> films.add(film));
 
             log.debug("film {} successfully added", film);
-            return film;
-        } else {
-            log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
-            throw new FilmorateValidationException("Provided release date: '" + film.getReleaseDate()
-                    + "' doesn't match criteria");
-        }
+            return getByID(newFilmId);
+
     }
 
     @Override
-    public Film update(Film film) {
-        if (ifRealiseDateMatchCriteria(film.getReleaseDate())) {
+    public Optional<Film> update(Film film) {
             films.stream().filter(x -> x.getId() == film.getId())
                     .findAny().ifPresentOrElse(f -> {
                         films.remove(f);
                         films.add(film);
                     }, () -> {
-                        throw new FilmNotFoundException("film doesn't exist");
+                        throw new EntityNotFoundException("film doesn't exist");
                     });
             log.debug("film {} successfully updated", film);
 
-            return film;
+            return getByID(film.getId());
 
-        } else {
-            log.debug("provided film release date doesn't match minimum criteria: {} ", film.getReleaseDate());
-            throw new ValidationException("Provided release date: '" + film.getReleaseDate()
-                    + "' doesn't match criteria");
-        }
+
     }
 
     @Override
-    public Film getByID(Integer id) {
+    public Optional<Film> getByID(Integer id) {
         return films.stream().filter(x -> x.getId() == id)
-                .findAny().orElseThrow(() -> {
-                    throw new FilmNotFoundException("film id: " + id + "doesn't exist");
-                });
+                .findAny();
     }
 
     @Override
@@ -84,7 +70,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean removeLike(long userId, Film film) {
+    public boolean removeLike(long userId, int filmId) {
+        Film film = getByID(filmId)
+                .stream()
+                .findAny()
+                .orElseThrow(()->new EntityNotFoundException("film with id +" + filmId + " not found" ));
         return film.removeLike(userId);
     }
 
@@ -103,5 +93,30 @@ public class InMemoryFilmStorage implements FilmStorage {
         return true;
     }
 
+    public Genre getGenreById(int id) {
+        return Arrays.stream(GenreDictionary.values())
+                .filter(x->x.id == id)
+                .map(genre -> new Genre(genre.id, genre.name()))
+                .findAny().orElseThrow(()->new EntityNotFoundException(String.format("genre with id: %d not found", id )));
+
+    }
+
+    public List<Genre> getAllGenres() {
+        return Arrays.stream(GenreDictionary.values())
+                .map(genre -> new Genre(genre.id, genre.name())).collect(Collectors.toList());
+    }
+
+    public Mpa getMPAById(int id) {
+        return Arrays.stream(MpaDictionary.values())
+                .filter(x->x.id == id)
+                .map(mpa -> new Mpa(mpa.id, mpa.name()))
+                .findAny().orElseThrow(()->new EntityNotFoundException(String.format("mpa with id: %d not found", id )));
+
+    }
+    @Override
+    public List<Mpa> getAllMPA() {
+        return Arrays.stream(MpaDictionary.values())
+                .map(mpa -> new Mpa(mpa.id, mpa.name())).collect(Collectors.toList());
+    }
 
 }

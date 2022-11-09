@@ -13,6 +13,8 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/test/java/ru/yandex/practicum/filmorate/FilmControllerTest.java
+!**/src/test/java/ru/yandex/practicum/filmorate/UserControllerTests.java
 
 ### STS ###
 .apt_generated
